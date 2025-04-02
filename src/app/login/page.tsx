@@ -51,9 +51,6 @@ export default function Login() {
                         </div>
                     </div>
 
-                    {/* Heading */}
-                    <h1 className="text-2xl font-bold text-center text-red-900 mb-6">Welcome!</h1>
-
                     {/* Login Form */}
                     <form className="space-y-5">
                         <div>
