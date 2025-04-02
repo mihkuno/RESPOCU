@@ -40,7 +40,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 // Sidebar component with logout modal integration
 function Sidebar({ onLogoutClick }: { onLogoutClick: () => void }) {
   const menuItems = [
-    { name: 'Home', icon: HomeIcon, href: '/dashboard/home' },
+    { name: 'Home', icon: HomeIcon, href: '/dashboard' },
     { name: 'Publications', icon: BookOpenIcon, href: '/dashboard/publications' },
     { name: 'Bookmark', icon: BookmarkIcon, href: '/dashboard/bookmarks' },
     { name: 'Archive', icon: ArchiveBoxIcon, href: '/dashboard/archive' },
