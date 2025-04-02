@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { 
   HomeIcon, 
   BookOpenIcon, 
@@ -16,16 +17,42 @@ import LogoutModal from '@/component/logoutModal';
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
+  // Brand colors matching landing page
+  const brandMaroon = '#9F1E22';
+  const brandYellow = '#FFB81C';
+
   const handleLogout = () => {
     console.log("User logged out");
     setIsLogoutModalOpen(false);
   };
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen bg-slate-50">
+      {/* Abstract Background Lines (similar to landing page) */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {/* Maroon abstract lines */}
+        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <path d="M0,30 Q25,10 50,30 T100,30" stroke={brandMaroon} strokeWidth="0.2" fill="none" opacity="0.1" />
+          <path d="M0,50 Q35,30 70,50 T100,50" stroke={brandMaroon} strokeWidth="0.3" fill="none" opacity="0.07" />
+          <path d="M0,65 Q40,85 60,65 T100,65" stroke={brandMaroon} strokeWidth="0.2" fill="none" opacity="0.1" />
+        </svg>
+        
+        {/* Yellow abstract lines */}
+        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <path d="M0,20 Q40,40 80,20 T100,20" stroke={brandYellow} strokeWidth="0.3" fill="none" opacity="0.1" />
+          <path d="M0,60 Q30,40 70,60 T100,60" stroke={brandYellow} strokeWidth="0.3" fill="none" opacity="0.1" />
+        </svg>
+        
+        {/* Abstract geometric elements */}
+        <div className="absolute top-20 left-20 w-32 h-32 border-2 border-yellow-500 rounded-full opacity-5"></div>
+        <div className="absolute bottom-20 right-20 w-64 h-64 border-2 border-red-900 rounded-full opacity-5"></div>
+      </div>
+
       <Sidebar onLogoutClick={() => setIsLogoutModalOpen(true)} />
-      <main className="flex-1 overflow-auto">
-        {children}
+      <main className="flex-1 overflow-auto relative">
+        <div className="relative z-10">
+          {children}
+        </div>
       </main>
       
       <LogoutModal 
@@ -39,6 +66,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 // Sidebar component with logout modal integration
 function Sidebar({ onLogoutClick }: { onLogoutClick: () => void }) {
+  // Brand colors matching landing page
+  const brandMaroon = '#9F1E22';
+  const brandYellow = '#FFB81C';
+
   const menuItems = [
     { name: 'Home', icon: HomeIcon, href: '/dashboard' },
     { name: 'Publications', icon: BookOpenIcon, href: '/dashboard/publications' },
@@ -46,34 +77,44 @@ function Sidebar({ onLogoutClick }: { onLogoutClick: () => void }) {
     { name: 'Archive', icon: ArchiveBoxIcon, href: '/dashboard/archive' },
     { name: 'User', icon: UserIcon, href: '/dashboard/users' },
   ];
+  
+  // Active state for menu styling demonstration
+  const [activeItem, setActiveItem] = useState('Home');
 
   return (
     <div 
-      className="w-64 flex flex-col justify-between" 
-      style={{ backgroundColor: '#292F36' }}
+      className="w-64 flex flex-col justify-between shadow-lg relative z-20 bg-white border-r border-gray-200"
     >
       <div>
-        {/* Logo */}
-        <div className="p-4 border-b border-gray-700">
+        {/* Logo with brand-colored accent */}
+        <div className="p-4 border-b border-gray-200 relative">
+          <div className="h-1 w-24 absolute top-0 left-0" style={{ backgroundColor: brandMaroon }}></div>
           <div className="flex items-center justify-center">
-            <div className="relative w-10 h-10 mr-2">
-              <img 
+            <div className="relative w-40 h-16 mr-2">
+              <Image 
                 src="/logo.png" 
-                alt="logo" 
-                className="w-full h-full object-contain" 
+                alt="EduChest logo" 
+                fill
+                priority
+                className="object-contain" 
               />
             </div>
-            <h1 className="text-white font-bold text-lg">Capitol University</h1>
           </div>
         </div>
 
         {/* Main Menu */}
         <nav className="p-4">
           <ul className="space-y-2">
-            {menuItems.map((item, index) => (
-              <li key={index}>
-                <Link href={item.href}>
-                  <div className="flex items-center p-3 text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-colors">
+            {menuItems.map((item) => (
+              <li key={item.name}>
+                <Link href={item.href} onClick={() => setActiveItem(item.name)}>
+                  <div 
+                    className={`flex items-center p-3 rounded-lg transition-colors ${
+                      activeItem === item.name
+                        ? `bg-red-900 text-white`
+                        : `text-gray-700 hover:bg-red-50 hover:text-red-900`
+                    }`}
+                  >
                     <item.icon className="h-5 w-5 mr-3" />
                     <span>{item.name}</span>
                   </div>
@@ -85,18 +126,14 @@ function Sidebar({ onLogoutClick }: { onLogoutClick: () => void }) {
       </div>
 
       {/* Bottom Menu - Logout */}
-      <div className="p-4 border-t border-gray-700">
-        <ul className="space-y-2">
-          <li>
-            <button
-              onClick={onLogoutClick}
-              className="w-full flex items-center p-3 text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
-            >
-              <LogoutIcon className="h-5 w-5 mr-3" />
-              <span>Logout</span>
-            </button>
-          </li>
-        </ul>
+      <div className="p-4 border-t border-gray-200">
+        <button
+          onClick={onLogoutClick}
+          className="w-full flex items-center p-3 text-gray-700 hover:text-red-900 hover:bg-red-50 rounded-lg transition-colors"
+        >
+          <LogoutIcon className="h-5 w-5 mr-3" />
+          <span>Logout</span>
+        </button>
       </div>
     </div>
   );
