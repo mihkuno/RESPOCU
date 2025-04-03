@@ -109,7 +109,7 @@ function Sidebar({ onLogoutClick }: { onLogoutClick: () => void }) {
               <li key={item.name}>
                 <Link href={item.href} onClick={() => setActiveItem(item.name)}>
                   <div 
-                    className={`flex items-center p-3 rounded-lg transition-colors ${
+                    className={`flex items-center p-3 rounded-lg transition-colors font-semibold ${
                       activeItem === item.name
                         ? `bg-red-900 text-white`
                         : `text-gray-700 hover:bg-red-50 hover:text-red-900`
