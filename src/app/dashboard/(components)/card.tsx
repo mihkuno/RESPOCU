@@ -27,8 +27,7 @@ interface Study {
   publishedDate: string;
   authors: Author[];
   publishedBy: Author;
-  tags: string[];
-  keywords: string[];
+  categories: string[]; // Renamed 'tags' to 'categories'
   isArchived: boolean;
   isBestPaper: boolean;
 }
@@ -134,34 +133,18 @@ const StudyCard: React.FC<StudyCardProps> = ({
           {study.description}
         </p>
         
-        {/* Keywords */}
-        {study.keywords.length > 0 && (
-          <div className="mb-4">
-            <h3 className="text-xs uppercase tracking-wider text-gray-500 mb-2">Keywords</h3>
-            <div className="flex flex-wrap gap-2">
-              {study.keywords.map((keyword, index) => (
-                <span
-                  key={`keyword-${index}`}
-                  className={`${colors.badgeBg} ${colors.badgeText} text-xs px-2 py-1 rounded-md`}
-                >
-                  {keyword}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
         
-        {/* Tags */}
-        {study.tags.length > 0 && (
+        {/* Categories */}
+        {study.categories.length > 0 && (
           <div className="mb-4">
-            <h3 className="text-xs uppercase tracking-wider text-gray-500 mb-2">Tags</h3>
+            <h3 className="text-xs uppercase tracking-wider text-gray-500 mb-2">Categories</h3>
             <div className="flex flex-wrap gap-2">
-              {study.tags.map((tag, index) => (
+              {study.categories.map((category, index) => (
                 <span
-                  key={`tag-${index}`}
+                  key={`category-${index}`}
                   className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-md"
                 >
-                  {tag}
+                  {category}
                 </span>
               ))}
             </div>
@@ -194,67 +177,63 @@ const StudyCard: React.FC<StudyCardProps> = ({
         {/* Action buttons */}
         <div className="flex justify-end items-center mt-4 pt-3 border-t border-gray-100" onClick={(e) => e.stopPropagation()}>
           <div className="flex items-center gap-1">
+            
             {!study.isArchived && (
+              <>
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleBookmark(study.id);
+                  }}
+                  className={`p-2 hover:bg-gray-100 rounded-full transition-colors`}
+                  title={isBookmarked ? "Remove bookmark" : "Bookmark"}
+                  aria-label={isBookmarked ? "Remove bookmark" : "Bookmark this study"}
+                >
+                  {isBookmarked ? (
+                    <BookmarkMinus className="text-red-600" size={18} />
+                  ) : (
+                    <Bookmark className="text-gray-600" size={18} />
+                  )}
+                </button>
+                
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (onArchive) onArchive(study.id);
+                  }}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  title="Archive"
+                  aria-label="Archive study"
+                >
+                  <Archive className="text-gray-600" size={18} />
+                </button>
+                
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (onEdit) onEdit(study.id);
+                  }}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  title="Edit"
+                  aria-label="Edit study"
+                >
+                  <Edit className="text-gray-600" size={18} />
+                </button>
+              </>
+            )}
+            
+            {isAdmin && isDashboard && (
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
-                  onToggleBookmark(study.id);
+                  if (onMarkBestPaper) onMarkBestPaper(study.id, !study.isBestPaper);
                 }}
-                className={`p-2 hover:bg-gray-100 rounded-full transition-colors`}
-                title={isBookmarked ? "Remove bookmark" : "Bookmark"}
-                aria-label={isBookmarked ? "Remove bookmark" : "Bookmark this study"}
+                className={`p-2 hover:bg-amber-100 rounded-full transition-colors ${study.isBestPaper ? 'bg-amber-100' : ''}`}
+                title={study.isBestPaper ? "Remove best paper mark" : "Mark as best paper"}
+                aria-label={study.isBestPaper ? "Remove best paper mark" : "Mark as best paper"}
               >
-                {isBookmarked ? (
-                  <BookmarkMinus className="text-red-600" size={18} />
-                ) : (
-                  <Bookmark className="text-gray-600" size={18} />
-                )}
+                <Star className={study.isBestPaper ? "text-amber-500" : "text-gray-400"} size={18} />
               </button>
-            )}
-            
-            {isAdmin && (
-              <>
-                {!study.isArchived && (
-                  <>
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (onArchive) onArchive(study.id);
-                      }}
-                      className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                      title="Archive"
-                      aria-label="Archive study"
-                    >
-                      <Archive className="text-gray-600" size={18} />
-                    </button>
-                    
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (onEdit) onEdit(study.id);
-                      }}
-                      className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                      title="Edit"
-                      aria-label="Edit study"
-                    >
-                      <Edit className="text-gray-600" size={18} />
-                    </button>
-                  </>
-                )}
-                {isDashboard && (
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (onMarkBestPaper) onMarkBestPaper(study.id, !study.isBestPaper);
-                    }}
-                    className={`p-2 hover:bg-amber-100 rounded-full transition-colors ${study.isBestPaper ? 'bg-amber-100' : ''}`}
-                    title={study.isBestPaper ? "Remove best paper mark" : "Mark as best paper"}
-                    aria-label={study.isBestPaper ? "Remove best paper mark" : "Mark as best paper"}
-                  >
-                    <Star className={study.isBestPaper ? "text-amber-500" : "text-gray-400"} size={18} />
-                  </button>
-                )}
-              </>
             )}
           </div>
         </div>
