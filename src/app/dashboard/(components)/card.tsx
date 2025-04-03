@@ -6,7 +6,6 @@ import {
   Bookmark, 
   BookmarkMinus, 
   Archive, 
-  Trash2, 
   Edit, 
   Award, 
   Star,
@@ -241,21 +240,6 @@ const StudyCard: React.FC<StudyCardProps> = ({
                     </button>
                   </>
                 )}
-                
-                {study.isArchived && (
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (onDelete) onDelete(study.id);
-                    }}
-                    className="p-2 hover:bg-red-100 rounded-full transition-colors"
-                    title="Delete permanently"
-                    aria-label="Delete study permanently"
-                  >
-                    <Trash2 className="text-red-600" size={18} />
-                  </button>
-                )}
-                
                 {isDashboard && (
                   <button 
                     onClick={(e) => {

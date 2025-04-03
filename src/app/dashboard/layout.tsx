@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { 
   HomeIcon, 
   BookOpenIcon, 
-  BookmarkIcon, 
+  // BookmarkIcon, 
   ArchiveBoxIcon, 
   UserIcon,
 } from '@heroicons/react/24/outline';
@@ -73,7 +73,7 @@ function Sidebar({ onLogoutClick }: { onLogoutClick: () => void }) {
   const menuItems = [
     { name: 'Home', icon: HomeIcon, href: '/dashboard' },
     { name: 'Publications', icon: BookOpenIcon, href: '/dashboard/publications' },
-    { name: 'Bookmark', icon: BookmarkIcon, href: '/dashboard/bookmarks' },
+    // { name: 'Bookmark', icon: BookmarkIcon, href: '/dashboard/bookmarks' },
     { name: 'Archive', icon: ArchiveBoxIcon, href: '/dashboard/archive' },
     { name: 'User', icon: UserIcon, href: '/dashboard/users' },
   ];
