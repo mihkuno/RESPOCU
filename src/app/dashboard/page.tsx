@@ -1,11 +1,10 @@
 "use client";
 
 import React, { useState, useMemo } from 'react';
-import { Search, Filter } from 'lucide-react';
+import { Search, ChevronsUpDown } from 'lucide-react';
 import StudyCard from '@/app/dashboard/(components)/card';
 import { useRouter } from 'next/navigation';
 
-// Define author and study types
 interface Author {
   id: number;
   name: string;
@@ -31,12 +30,9 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('newest');
   const [bookmarks, setBookmarks] = useState<number[]>([]);
-  const [showArchived, setShowArchived] = useState<boolean>(false);
-  
-  // For demo purposes, assume user is admin
+  const [showBestResearch, setShowBestResearch] = useState<boolean>(false);
   const isAdmin = true;
 
-  // Sample expanded study data
   const studies: Study[] = [
     {
       id: 1,
@@ -88,27 +84,23 @@ export default function Dashboard() {
     }
   ];
 
-  // Filtered and sorted studies
   const filteredStudies = useMemo(() => {
     return studies
       .filter(study =>
-        // Filter by search query
         (study.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         study.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
         study.authors.some(author => author.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
         study.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())) ||
         study.keywords.some(keyword => keyword.toLowerCase().includes(searchQuery.toLowerCase()))) &&
-        // Filter by archive status
-        (showArchived ? study.isArchived : !study.isArchived)
+        (showBestResearch ? study.isBestPaper : true)
       )
       .sort((a, b) => {
         if (sortBy === 'newest') return new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime();
         if (sortBy === 'oldest') return new Date(a.publishedDate).getTime() - new Date(b.publishedDate).getTime();
         return a.title.localeCompare(b.title);
       });
-  }, [searchQuery, sortBy, showArchived]);
+  }, [searchQuery, sortBy, showBestResearch]);
 
-  // Action handlers
   const toggleBookmark = (studyId: number): void => {
     if (bookmarks.includes(studyId)) {
       setBookmarks(bookmarks.filter(id => id !== studyId));
@@ -118,34 +110,28 @@ export default function Dashboard() {
   };
 
   const handleArchive = (studyId: number): void => {
-    // In a real app, this would make an API call
     alert(`Archive study with ID: ${studyId}`);
   };
 
   const handleDelete = (studyId: number): void => {
-    // In a real app, this would make an API call
     alert(`Delete study with ID: ${studyId}`);
   };
 
   const handleEdit = (studyId: number): void => {
-    // In a real app, this would navigate to edit page
     router.push(`/studies/${studyId}/edit`);
   };
 
   const handleMarkBestPaper = (studyId: number, status: boolean): void => {
-    // In a real app, this would make an API call
     alert(`Mark study ${studyId} as best paper: ${status}`);
   };
 
   const handleCardClick = (studyId: number): void => {
-    // Navigate to study details page
     router.push(`/studies/${studyId}`);
   };
 
   return (
     <div className="min-h-screen p-4">
       <div className="container mx-auto px-4 py-8">
-        {/* Dashboard Header */}
         <header className="mb-10">
           <div className="bg-gradient-to-r from-red-900 to-red-800 h-2 w-24 mb-4"></div>
           <h1 className="text-3xl font-bold text-gray-900">
@@ -161,45 +147,36 @@ export default function Dashboard() {
             <input
               type="text"
               placeholder="Search studies, authors, keywords..."
-              className="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-200 
-                focus:outline-none focus:ring-2 focus:ring-red-900 
-                transition-all duration-300 ease-in-out"
+              className="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-900 transition-all duration-300 ease-in-out"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <Search
-              className="absolute left-3 top-3.5 text-slate-400"
-              size={20}
-            />
+            <Search className="absolute left-3 top-3.5 text-slate-400" size={20} />
           </div>
 
-          <select
-            className="pl-4 pr-10 py-3 rounded-lg border border-slate-200 
-              bg-white appearance-none focus:outline-none 
-              focus:ring-2 focus:ring-red-900 
-              transition-all duration-300 ease-in-out"
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-          >
-            <option value="newest">Newest First</option>
-            <option value="oldest">Oldest First</option>
-            <option value="title">Title (A-Z)</option>
-          </select>
+          <div className="relative">
+            <select
+              className="pl-4 pr-10 py-3 rounded-lg border border-slate-200 bg-white appearance-none focus:outline-none focus:ring-2 focus:ring-red-900 transition-all duration-300 ease-in-out"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+            >
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="title">Title (A-Z)</option>
+            </select>
+            <ChevronsUpDown className="absolute right-3 top-3.5 text-slate-400" size={20} />
+          </div>
 
           {isAdmin && (
             <button
-              className={`flex items-center gap-2 px-4 py-3 rounded-lg border 
-                transition-all duration-300 ease-in-out
-                ${showArchived ? 'bg-red-900 text-white border-red-900' : 'bg-white text-gray-700 border-slate-200'}`}
-              onClick={() => setShowArchived(!showArchived)}
+              className={`flex items-center gap-2 px-4 py-3 rounded-lg border transition-all duration-300 ease-in-out ${showBestResearch ? 'bg-red-900 text-white border-red-900' : 'bg-white text-gray-700 border-slate-200'}`}
+              onClick={() => setShowBestResearch(!showBestResearch)}
             >
-              <Filter size={18} />
-              {showArchived ? 'Show Active' : 'Show Archived'}
+              {showBestResearch ? 'Show All' : 'Show Best Research'}
             </button>
           )}
         </div>
 
-        {/* Studies Grid using enhanced StudyCard component */}
         {filteredStudies.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredStudies.map((study) => (
@@ -224,17 +201,16 @@ export default function Dashboard() {
               No studies found
             </h3>
             <p className="text-gray-600 mb-6">
-              {showArchived 
-                ? "No archived studies match your search criteria"
+              {showBestResearch
+                ? "No best research studies match your search criteria"
                 : "Try adjusting your search query or explore different filters"}
             </p>
             <button
               onClick={() => {
                 setSearchQuery('');
-                if (showArchived) setShowArchived(false);
+                if (showBestResearch) setShowBestResearch(false);
               }}
-              className="px-6 py-3 bg-red-900 text-white rounded-lg 
-                hover:bg-red-800 transition-colors"
+              className="px-6 py-3 bg-red-900 text-white rounded-lg hover:bg-red-800 transition-colors"
             >
               Reset Filters
             </button>
