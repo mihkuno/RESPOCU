@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from 'react';
-import { Search, ChevronsUpDown, Award, Filter } from 'lucide-react';
+import { Search, ChevronsUpDown, Award, Filter, ChevronDown } from 'lucide-react';
 import StudyCard from '@/app/dashboard/(components)/card';
 import { useRouter } from 'next/navigation';
 
@@ -30,7 +30,8 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('newest');
   const [bookmarks, setBookmarks] = useState<number[]>([]);
-  const [showBestResearch, setShowBestResearch] = useState<boolean>(false);
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const isAdmin = true;
 
   const studies: Study[] = [
@@ -84,22 +85,29 @@ export default function Dashboard() {
     }
   ];
 
+  // Extract all unique categories from tags for the dropdown
+  const categories = [...new Set(studies.flatMap(study => study.tags))];
+
   const filteredStudies = useMemo(() => {
     return studies
-      .filter(study =>
-        (study.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        study.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        study.authors.some(author => author.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        study.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        study.keywords.some(keyword => keyword.toLowerCase().includes(searchQuery.toLowerCase()))) &&
-        (showBestResearch ? study.isBestPaper : true)
-      )
+      .filter(study => {
+        const matchesSearch = study.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          study.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          study.authors.some(author => author.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          study.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          study.keywords.some(keyword => keyword.toLowerCase().includes(searchQuery.toLowerCase()));
+        
+        // Filter by category
+        if (categoryFilter === 'all') return matchesSearch;
+        if (categoryFilter === 'best') return matchesSearch && study.isBestPaper;
+        return matchesSearch && study.tags.includes(categoryFilter);
+      })
       .sort((a, b) => {
         if (sortBy === 'newest') return new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime();
         if (sortBy === 'oldest') return new Date(a.publishedDate).getTime() - new Date(b.publishedDate).getTime();
         return a.title.localeCompare(b.title);
       });
-  }, [searchQuery, sortBy, showBestResearch]);
+  }, [searchQuery, sortBy, categoryFilter]);
 
   const toggleBookmark = (studyId: number): void => {
     if (bookmarks.includes(studyId)) {
@@ -127,6 +135,18 @@ export default function Dashboard() {
 
   const handleCardClick = (studyId: number): void => {
     router.push(`/studies/${studyId}`);
+  };
+
+  const selectCategory = (category: string) => {
+    setCategoryFilter(category);
+    setIsDropdownOpen(false);
+  };
+
+  // Format the display name for the current category
+  const getCurrentCategoryDisplay = () => {
+    if (categoryFilter === 'all') return 'All Categories';
+    if (categoryFilter === 'best') return 'Best Papers';
+    return categoryFilter;
   };
 
   // Count best papers for the badge
@@ -171,26 +191,60 @@ export default function Dashboard() {
           </div>
 
           {isAdmin && (
-            <button
-              className={`flex items-center justify-center gap-2 px-5 py-3 rounded-lg border transition-all duration-300 ease-in-out relative ${
-                showBestResearch 
-                  ? 'bg-red-900 text-white border-red-900 shadow-md hover:bg-red-800' 
-                  : 'bg-white text-gray-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300'
-              }`}
-              onClick={() => setShowBestResearch(!showBestResearch)}
-              aria-pressed={showBestResearch}
-            >
-              <Award 
-                className={`${showBestResearch ? 'text-yellow-300' : 'text-yellow-500'}`} 
-                size={22} 
-              />
-              <span>{showBestResearch ? 'All' : 'Best'}</span>
-              {!showBestResearch && bestPapersCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                  {bestPapersCount}
-                </span>
+            <div className="relative">
+              <button
+                className="flex items-center justify-between gap-2 px-4 py-3 w-48 rounded-lg border border-slate-200 bg-white text-gray-700 hover:bg-slate-50 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-900"
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                aria-haspopup="true"
+                aria-expanded={isDropdownOpen}
+              >
+                <div className="flex items-center gap-2">
+                  {categoryFilter === 'best' && (
+                    <Award className="text-yellow-500" size={20} />
+                  )}
+                  <span>{getCurrentCategoryDisplay()}</span>
+                </div>
+                <ChevronDown size={18} className={`transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {isDropdownOpen && (
+                <div className="absolute z-10 mt-1 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+                  <div className="py-1" role="menu" aria-orientation="vertical">
+                    <button
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-slate-100 flex items-center gap-2"
+                      onClick={() => selectCategory('all')}
+                      role="menuitem"
+                    >
+                      All Categories
+                    </button>
+                    <button
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-slate-100 flex items-center gap-2"
+                      onClick={() => selectCategory('best')}
+                      role="menuitem"
+                    >
+                      <Award className="text-yellow-500" size={18} />
+                      Best Papers 
+                      {bestPapersCount > 0 && (
+                        <span className="ml-auto bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                          {bestPapersCount}
+                        </span>
+                      )}
+                    </button>
+                    <div className="border-t border-slate-200 my-1"></div>
+                    {categories.map(category => (
+                      <button
+                        key={category}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-slate-100"
+                        onClick={() => selectCategory(category)}
+                        role="menuitem"
+                      >
+                        {category}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               )}
-            </button>
+            </div>
           )}
         </div>
 
@@ -218,14 +272,16 @@ export default function Dashboard() {
               No studies found
             </h3>
             <p className="text-gray-600 mb-6">
-              {showBestResearch
+              {categoryFilter === 'best'
                 ? "No best research studies match your search criteria"
-                : "Try adjusting your search query or explore different filters"}
+                : categoryFilter !== 'all'
+                  ? `No studies in the "${categoryFilter}" category match your search criteria`
+                  : "Try adjusting your search query or explore different filters"}
             </p>
             <button
               onClick={() => {
                 setSearchQuery('');
-                if (showBestResearch) setShowBestResearch(false);
+                setCategoryFilter('all');
               }}
               className="px-6 py-3 bg-red-900 text-white rounded-lg hover:bg-red-800 transition-colors flex items-center gap-2"
             >
