@@ -11,8 +11,8 @@ interface ArchivedStudy {
   authors: { id: number; name: string; role: 'student' | 'faculty' }[];
   publishedDate: string;
   publishedBy: { id: number; name: string; role: 'faculty' };
-  tags: string[];
-  keywords: string[];
+  categories: string[];
+  type: string,
   isArchived: boolean;
   isBestPaper: boolean;
 }
@@ -32,8 +32,8 @@ export default function ArchivePage() {
       ],
       publishedDate: "2023-05-15",
       publishedBy: { id: 3, name: "Prof. Admin", role: 'faculty' },
-      tags: ["history", "education"],
-      keywords: ["learning", "methods", "evolution"],
+      categories: ["history", "education"],
+      type: "Experimental Research",
       isArchived: true,
       isBestPaper: false,
     },
@@ -47,8 +47,8 @@ export default function ArchivePage() {
       ],
       publishedDate: "2023-04-22",
       publishedBy: { id: 6, name: "Prof. SysAdmin", role: 'faculty' },
-      tags: ["computer science", "education"],
-      keywords: ["early", "programs", "universities"],
+      categories: ["computer science", "education"],
+      type: "Experimental Research",
       isArchived: true,
       isBestPaper: true,
     },
@@ -62,10 +62,10 @@ export default function ArchivePage() {
       ],
       publishedDate: "2023-03-10",
       publishedBy: { id: 9, name: "Prof. Admin", role: 'faculty' },
-      tags: ["assessment", "education"],
-      keywords: ["traditional", "paper-based", "effectiveness"],
+      categories: ["assessment", "education"],
+      type: "Experimental Research",
       isArchived: true,
-      isBestPaper: false,
+      isBestPaper: true,
     },
   ];
 

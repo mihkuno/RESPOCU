@@ -2,6 +2,28 @@
 
 import { useState } from 'react';
 import { FiTrash2, FiPlus, FiX } from 'react-icons/fi';
+import { 
+  FiUsers, 
+  FiBarChart2, 
+  FiActivity, 
+  FiFileText, 
+  FiGitBranch, 
+  FiTrendingUp, 
+  FiBriefcase, 
+  FiClock, 
+  FiGlobe, 
+  FiGrid, 
+  FiCode 
+} from 'react-icons/fi';
+import { 
+  FiHeart, 
+  FiCloud, 
+  FiCpu, 
+  FiDollarSign, 
+  FiBookOpen, 
+  FiUsers as FiUsersAlt, 
+  FiCompass 
+} from 'react-icons/fi';
 import StudyCard from '@/app/dashboard/(components)/card';
 
 interface Author {
@@ -18,29 +40,61 @@ interface Study {
   publishedDate: string;
   authors: Author[];
   publishedBy: Author;
-  tags: string[];
-  keywords: string[];
+  categories: string[]; // Renamed tags to categories
   isArchived: boolean;
   isBestPaper: boolean;
-  category: string; // Added category field
 }
+
+// Research types with icons
+const researchTypes = [
+  { value: "Qualitative Research", icon: <FiUsers className="mr-2" /> },
+  { value: "Quantitative Research", icon: <FiBarChart2 className="mr-2" /> },
+  { value: "Experimental Research", icon: <FiActivity className="mr-2" /> },
+  { value: "Descriptive Research", icon: <FiFileText className="mr-2" /> },
+  { value: "Correlational Research", icon: <FiGitBranch className="mr-2" /> },
+  { value: "Action Research", icon: <FiTrendingUp className="mr-2" /> },
+  { value: "Case Study Research", icon: <FiBriefcase className="mr-2" /> },
+  { value: "Longitudinal Research", icon: <FiClock className="mr-2" /> },
+  { value: "Ethnographic Research", icon: <FiGlobe className="mr-2" /> },
+  { value: "Mixed-Methods Research", icon: <FiGrid className="mr-2" /> },
+  { value: "Developmental Research", icon: <FiCode className="mr-2" /> }
+];
+
+// Categories with icons (formerly tags)
+const availableCategories = [
+  { value: "Health & Wellness", icon: <FiHeart className="mr-2" /> },
+  { value: "Environment & Sustainability", icon: <FiCloud className="mr-2" /> },
+  { value: "Technology & Innovation", icon: <FiCpu className="mr-2" /> },
+  { value: "Economics & Development", icon: <FiDollarSign className="mr-2" /> },
+  { value: "Education & Learning", icon: <FiBookOpen className="mr-2" /> },
+  { value: "Sociology & Society", icon: <FiUsersAlt className="mr-2" /> },
+  { value: "Astronomy & Exploration", icon: <FiCompass className="mr-2" /> }
+];
 
 export default function CreateStudyPage() {
   const [study, setStudy] = useState({
     title: '',
     description: '',
     authors: [] as string[],
-    tags: [],
+    type: '', // Changed to single type selection
+    categories: [] as string[], // Renamed tags to categories
     isDraft: true,
-    category: '', // Added category to the state
   });
   const [newAuthor, setNewAuthor] = useState('');
-  const [newTag, setNewTag] = useState('');
   const [publishedStudies, setPublishedStudies] = useState<Study[]>([]); // State to store published studies
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setStudy(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleCategorySelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedCategory = e.target.value;
+    if (selectedCategory && !study.categories.includes(selectedCategory)) {
+      setStudy(prev => ({ ...prev, categories: [...prev.categories, selectedCategory] }));
+    }
+    // Reset the select value
+    e.target.value = "";
   };
 
   const addAuthor = () => {
@@ -57,17 +111,10 @@ export default function CreateStudyPage() {
     }));
   };
 
-  const addTag = () => {
-    if (newTag.trim() && !study.tags.includes(newTag.trim())) {
-      setStudy(prev => ({ ...prev, tags: [...prev.tags, newTag.trim()] }));
-      setNewTag('');
-    }
-  };
-
-  const removeTag = (tagToRemove: string) => {
+  const removeCategory = (categoryToRemove: string) => {
     setStudy(prev => ({
       ...prev,
-      tags: prev.tags.filter(tag => tag !== tagToRemove),
+      categories: prev.categories.filter(category => category !== categoryToRemove),
     }));
   };
 
@@ -78,7 +125,7 @@ export default function CreateStudyPage() {
       id: Date.now(), // Generate a unique ID (replace with backend ID)
       title: study.title,
       description: study.description,
-      type: 'Research', // Replace with actual type
+      type: study.type,
       publishedDate: new Date().toISOString(),
       authors: study.authors.map((authorName, index) => ({
         id: index, // Replace with actual author IDs
@@ -90,11 +137,9 @@ export default function CreateStudyPage() {
         name: 'Faculty Member', // Replace with actual publisher name
         role: 'faculty', // Replace with actual role
       },
-      tags: study.tags,
-      keywords: [], // Replace with actual keywords
+      categories: study.categories, // Renamed tags to categories
       isArchived: false,
       isBestPaper: false,
-      category: study.category, // Added category to the new study object
     };
 
     setPublishedStudies(prev => [...prev, newStudy]); // Add the new study to the list
@@ -105,9 +150,9 @@ export default function CreateStudyPage() {
       title: '',
       description: '',
       authors: [],
-      tags: [],
+      type: '',
+      categories: [], // Renamed tags to categories
       isDraft: false,
-      category: '', // Reset the category after submission
     });
   };
 
@@ -117,9 +162,9 @@ export default function CreateStudyPage() {
         title: '',
         description: '',
         authors: [],
-        tags: [],
+        type: '',
+        categories: [], // Renamed tags to categories
         isDraft: true,
-        category: '',
       });
     }
   };
@@ -159,6 +204,35 @@ export default function CreateStudyPage() {
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#292F36]"
             required
           />
+        </div>
+
+        {/* Type - Changed to Select with Icons */}
+        <div className="mb-6">
+          <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-2">
+            Research Type *
+          </label>
+          <select
+            id="type"
+            name="type"
+            value={study.type}
+            onChange={handleInputChange}
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#292F36]"
+            required
+          >
+            <option value="">Select Research Type</option>
+            {researchTypes.map((type) => (
+              <option key={type.value} value={type.value}>
+                {type.value}
+              </option>
+            ))}
+          </select>
+          {/* Display selected type with icon */}
+          {study.type && (
+            <div className="mt-2 bg-gray-100 px-3 py-2 rounded-md inline-flex items-center">
+              {researchTypes.find(t => t.value === study.type)?.icon}
+              <span>{study.type}</span>
+            </div>
+          )}
         </div>
 
         {/* Authors */}
@@ -201,71 +275,48 @@ export default function CreateStudyPage() {
           )}
         </div>
 
-        {/* Tags */}
+        {/* Categories - Changed to Select with Icons */}
         <div className="mb-6">
-          <label htmlFor="tags" className="block text-sm font-medium text-gray-700 mb-2">
-            Tags
-          </label>
-          <div className="flex mb-2">
-            <input
-              type="text"
-              id="newTag"
-              value={newTag}
-              onChange={(e) => setNewTag(e.target.value)}
-              placeholder="Add tag"
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-[#292F36]"
-            />
-            <button
-              type="button"
-              onClick={addTag}
-              className="bg-[#292F36] text-white px-4 py-2 rounded-r-md hover:bg-[#1a1f24] transition-colors"
-            >
-              <FiPlus className="h-5 w-5" />
-            </button>
-          </div>
-          {study.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {study.tags.map((tag, index) => (
-                <div key={index} className="bg-gray-100 px-3 py-1 rounded-full flex items-center">
-                  <span className="text-sm">{tag}</span>
-                  <button
-                    type="button"
-                    onClick={() => removeTag(tag)}
-                    className="ml-2 text-gray-500 hover:text-red-500"
-                  >
-                    <FiX className="h-4 w-4" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Category */}
-        <div className="mb-6">
-          <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
-            Category *
+          <label htmlFor="categories" className="block text-sm font-medium text-gray-700 mb-2">
+            Categories
           </label>
           <select
-            id="category"
-            name="category"
-            value={study.category}
-            onChange={handleInputChange}
+            id="categories"
+            name="categories"
+            value=""
+            onChange={handleCategorySelection}
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#292F36]"
-            required
           >
-            <option value="">Select Category</option>
-            <option value="Health Sciences">Health Sciences</option>
-            <option value="Energy & Environment">Energy & Environment</option>
-            <option value="Technology & Innovation">Technology & Innovation</option>
-            <option value="Social Sciences">Social Sciences</option>
-            <option value="Business & Economics">Business & Economics</option>
-            <option value="Education & Learning">Education & Learning</option>
-            <option value="Culture & Society">Culture & Society</option>
-            <option value="Engineering & Design">Engineering & Design</option>
-            <option value="Agriculture & Food Science">Agriculture & Food Science</option>
-            <option value="Ethics & Philosophy">Ethics & Philosophy</option>
+            <option value="">Select Categories</option>
+            {availableCategories
+              .filter(category => !study.categories.includes(category.value))
+              .map((category) => (
+                <option key={category.value} value={category.value}>
+                  {category.value}
+                </option>
+              ))}
           </select>
+          
+          {study.categories.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-2">
+              {study.categories.map((category, index) => {
+                const categoryObj = availableCategories.find(c => c.value === category);
+                return (
+                  <div key={index} className="bg-gray-100 px-3 py-1 rounded-full flex items-center">
+                    {categoryObj?.icon}
+                    <span className="text-sm">{category}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeCategory(category)}
+                      className="ml-2 text-gray-500 hover:text-red-500"
+                    >
+                      <FiX className="h-4 w-4" />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Form Actions */}
@@ -273,7 +324,7 @@ export default function CreateStudyPage() {
           <button
             type="button"
             onClick={discardDraft}
-            className="flex items-center text-red-500 hover:text-red-700"
+            className="flex items-center text-red-500 hover:text-red-700 font-semibold cursor-pointer"
           >
             <FiTrash2 className="h-5 w-5 mr-2" />
             Discard Draft
@@ -282,13 +333,13 @@ export default function CreateStudyPage() {
             <button
               type="button"
               onClick={() => setStudy(prev => ({ ...prev, isDraft: true }))}
-              className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+              className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-semibold cursor-pointer"
             >
               Save as Draft
             </button>
             <button
               type="submit"
-              className="px-6 py-2 bg-[#292F36] text-white rounded-md hover:bg-[#1a1f24]"
+              className="px-6 py-2 bg-[#292F36] text-white rounded-md hover:bg-[#1a1f24] font-semibold cursor-pointer"
             >
               Publish Study
             </button>
