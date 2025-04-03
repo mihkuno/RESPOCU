@@ -34,7 +34,7 @@ export default function Dashboard() {
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const isAdmin = true;
 
-  const studies: Study[] = [
+  const [studies, setStudies] = useState<Study[]>([
     {
       id: 1,
       title: "The Impact of Social Media on Academic Performance",
@@ -46,8 +46,8 @@ export default function Dashboard() {
         { id: 102, name: "Juan Dela Cruz", role: "student" }
       ],
       publishedBy: { id: 201, name: "Dr. Robert Lee", role: "faculty" },
-      tags: ["Education", "Social Media"],
-      keywords: ["Academic Performance", "Social Media", "Student GPA", "Research"],
+      tags: ["Education & Learning", "Social Media"],
+      keywords: ["Learning", "Technology", "Students", "Analysis"],
       isArchived: false,
       isBestPaper: true
     },
@@ -62,8 +62,8 @@ export default function Dashboard() {
         { id: 104, name: "Sarah Chen", role: "student" }
       ],
       publishedBy: { id: 202, name: "Dr. Anna Garcia", role: "faculty" },
-      tags: ["Psychology", "Health"],
-      keywords: ["Sleep", "Cognitive Function", "Memory", "Experimental"],
+      tags: ["Health Sciences", "Health"],
+      keywords: ["Health", "Cognition", "Experiment", "Memory"],
       isArchived: true,
       isBestPaper: false
     },
@@ -78,15 +78,64 @@ export default function Dashboard() {
         { id: 106, name: "James Wilson", role: "student" }
       ],
       publishedBy: { id: 203, name: "Dr. Michael Torres", role: "faculty" },
-      tags: ["Education", "Culture"],
-      keywords: ["Cultural Studies", "Learning Styles", "Qualitative"],
+      tags: ["Culture & Society", "Education & Learning"],
+      keywords: ["Culture", "Learning", "Qualitative", "Society"],
       isArchived: false,
       isBestPaper: false
-    }
-  ];
+    },
+    {
+      id: 4,
+      title: "Sustainable Energy Solutions",
+      description: "Analysis of renewable energy sources and their impact on reducing carbon footprint.",
+      type: "Review Paper",
+      publishedDate: "2023-09-05",
+      authors: [{ id: 107, name: "Emily Green", role: "student" }],
+      publishedBy: { id: 204, name: "Prof. David Brown", role: "faculty" },
+      tags: ["Energy & Environment"],
+      keywords: ["Renewable Energy", "Sustainability", "Environment"],
+      isArchived: false,
+      isBestPaper: false,
+    },
+    {
+      id: 5,
+      title: "Artificial Intelligence in Healthcare",
+      description: "Exploring the applications of AI in diagnostics and patient care.",
+      type: "Case Study",
+      publishedDate: "2023-11-20",
+      authors: [{ id: 108, name: "Carlos Ramirez", role: "student" }],
+      publishedBy: { id: 205, name: "Dr. Sofia Martinez", role: "faculty" },
+      tags: ["Technology & Innovation", "Health Sciences"],
+      keywords: ["AI", "Healthcare", "Diagnostics", "Innovation"],
+      isArchived: false,
+      isBestPaper: false,
+    },
+    {
+      id: 6,
+      title: "The Economics of Digital Marketing",
+      description: "Analyzing the economic impact of digital marketing strategies on small businesses.",
+      type: "Economic Analysis",
+      publishedDate: "2024-01-15",
+      authors: [{ id: 109, name: "Laura Kim", role: "student" }],
+      publishedBy: { id: 206, name: "Prof. John Smith", role: "faculty" },
+      tags: ["Business & Economics", "Technology & Innovation"],
+      keywords: ["Digital Marketing", "Economics", "Small Business"],
+      isArchived: false,
+      isBestPaper: false,
+    },
+  ]);
 
-  // Extract all unique categories from tags for the dropdown
-  const categories = [...new Set(studies.flatMap(study => study.tags))];
+  const categoryOptions = [
+    "Health Sciences",
+    "Energy & Environment",
+    "Technology & Innovation",
+    "Social Sciences",
+    "Business & Economics",
+    "Education & Learning",
+    "Culture & Society",
+    "Engineering & Design",
+    "Agriculture & Food Science",
+    "Ethics & Philosophy",
+  ];
 
   const filteredStudies = useMemo(() => {
     return studies
@@ -96,8 +145,7 @@ export default function Dashboard() {
           study.authors.some(author => author.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
           study.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())) ||
           study.keywords.some(keyword => keyword.toLowerCase().includes(searchQuery.toLowerCase()));
-        
-        // Filter by category
+
         if (categoryFilter === 'all') return matchesSearch;
         if (categoryFilter === 'best') return matchesSearch && study.isBestPaper;
         return matchesSearch && study.tags.includes(categoryFilter);
@@ -107,7 +155,7 @@ export default function Dashboard() {
         if (sortBy === 'oldest') return new Date(a.publishedDate).getTime() - new Date(b.publishedDate).getTime();
         return a.title.localeCompare(b.title);
       });
-  }, [searchQuery, sortBy, categoryFilter]);
+  }, [searchQuery, sortBy, categoryFilter, studies]);
 
   const toggleBookmark = (studyId: number): void => {
     if (bookmarks.includes(studyId)) {
@@ -130,7 +178,13 @@ export default function Dashboard() {
   };
 
   const handleMarkBestPaper = (studyId: number, status: boolean): void => {
-    alert(`Mark study ${studyId} as best paper: ${status}`);
+    setStudies(prevStudies => {
+      const bestStudy = prevStudies.find(study => study.isBestPaper);
+      if (status && bestStudy && bestStudy.id !== studyId) {
+        return prevStudies.map(study => study.id === bestStudy.id ? { ...study, isBestPaper: false } : study)
+      }
+      return prevStudies.map(study => study.id === studyId ? { ...study, isBestPaper: status } : study)
+    });
   };
 
   const handleCardClick = (studyId: number): void => {
@@ -142,14 +196,12 @@ export default function Dashboard() {
     setIsDropdownOpen(false);
   };
 
-  // Format the display name for the current category
   const getCurrentCategoryDisplay = () => {
     if (categoryFilter === 'all') return 'All Categories';
     if (categoryFilter === 'best') return 'Best Papers';
     return categoryFilter;
   };
 
-  // Count best papers for the badge
   const bestPapersCount = studies.filter(study => study.isBestPaper).length;
 
   return (
@@ -206,7 +258,7 @@ export default function Dashboard() {
                 </div>
                 <ChevronDown size={18} className={`transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
-              
+
               {isDropdownOpen && (
                 <div className="absolute z-10 mt-1 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
                   <div className="py-1" role="menu" aria-orientation="vertical">
@@ -223,7 +275,7 @@ export default function Dashboard() {
                       role="menuitem"
                     >
                       <Award className="text-yellow-500" size={18} />
-                      Best Papers 
+                      Best Papers
                       {bestPapersCount > 0 && (
                         <span className="ml-auto bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                           {bestPapersCount}
@@ -231,7 +283,7 @@ export default function Dashboard() {
                       )}
                     </button>
                     <div className="border-t border-slate-200 my-1"></div>
-                    {categories.map(category => (
+                    {categoryOptions.map(category => (
                       <button
                         key={category}
                         className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-slate-100"

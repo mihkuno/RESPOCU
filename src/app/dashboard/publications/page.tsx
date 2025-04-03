@@ -255,12 +255,16 @@ export default function CreateStudyPage() {
             required
           >
             <option value="">Select Category</option>
-            <option value="Education">Education</option>
-            <option value="Environment">Environment</option>
-            <option value="Technology">Technology</option>
-            <option value="Medicine">Health</option>
-            <option value="Sociology">Social</option>
-            <option value="History">History</option>
+            <option value="Health Sciences">Health Sciences</option>
+            <option value="Energy & Environment">Energy & Environment</option>
+            <option value="Technology & Innovation">Technology & Innovation</option>
+            <option value="Social Sciences">Social Sciences</option>
+            <option value="Business & Economics">Business & Economics</option>
+            <option value="Education & Learning">Education & Learning</option>
+            <option value="Culture & Society">Culture & Society</option>
+            <option value="Engineering & Design">Engineering & Design</option>
+            <option value="Agriculture & Food Science">Agriculture & Food Science</option>
+            <option value="Ethics & Philosophy">Ethics & Philosophy</option>
           </select>
         </div>
 
