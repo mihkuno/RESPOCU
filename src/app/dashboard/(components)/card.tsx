@@ -1,4 +1,3 @@
-
 "use client";
 
 import React from 'react';
@@ -195,21 +194,23 @@ const StudyCard: React.FC<StudyCardProps> = ({
         {/* Action buttons */}
         <div className="flex justify-end items-center mt-4 pt-3 border-t border-gray-100" onClick={(e) => e.stopPropagation()}>
           <div className="flex items-center gap-1">
-            <button 
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleBookmark(study.id);
-              }}
-              className={`p-2 hover:bg-gray-100 rounded-full transition-colors`}
-              title={isBookmarked ? "Remove bookmark" : "Bookmark"}
-              aria-label={isBookmarked ? "Remove bookmark" : "Bookmark this study"}
-            >
-              {isBookmarked ? (
-                <BookmarkMinus className="text-red-600" size={18} />
-              ) : (
-                <Bookmark className="text-gray-600" size={18} />
-              )}
-            </button>
+            {!study.isArchived && (
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleBookmark(study.id);
+                }}
+                className={`p-2 hover:bg-gray-100 rounded-full transition-colors`}
+                title={isBookmarked ? "Remove bookmark" : "Bookmark"}
+                aria-label={isBookmarked ? "Remove bookmark" : "Bookmark this study"}
+              >
+                {isBookmarked ? (
+                  <BookmarkMinus className="text-red-600" size={18} />
+                ) : (
+                  <Bookmark className="text-gray-600" size={18} />
+                )}
+              </button>
+            )}
             
             {isAdmin && (
               <>
