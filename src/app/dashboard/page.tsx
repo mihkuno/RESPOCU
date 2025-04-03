@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from 'react';
-import { Search, ChevronsUpDown } from 'lucide-react';
+import { Search, ChevronsUpDown, Award, Filter } from 'lucide-react';
 import StudyCard from '@/app/dashboard/(components)/card';
 import { useRouter } from 'next/navigation';
 
@@ -129,6 +129,9 @@ export default function Dashboard() {
     router.push(`/studies/${studyId}`);
   };
 
+  // Count best papers for the badge
+  const bestPapersCount = studies.filter(study => study.isBestPaper).length;
+
   return (
     <div className="min-h-screen p-4">
       <div className="container mx-auto px-4 py-8">
@@ -169,10 +172,24 @@ export default function Dashboard() {
 
           {isAdmin && (
             <button
-              className={`flex items-center gap-2 px-4 py-3 rounded-lg border transition-all duration-300 ease-in-out ${showBestResearch ? 'bg-red-900 text-white border-red-900' : 'bg-white text-gray-700 border-slate-200'}`}
+              className={`flex items-center justify-center gap-2 px-5 py-3 rounded-lg border transition-all duration-300 ease-in-out relative ${
+                showBestResearch 
+                  ? 'bg-red-900 text-white border-red-900 shadow-md hover:bg-red-800' 
+                  : 'bg-white text-gray-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300'
+              }`}
               onClick={() => setShowBestResearch(!showBestResearch)}
+              aria-pressed={showBestResearch}
             >
-              {showBestResearch ? 'Show All' : 'Show Best Research'}
+              <Award 
+                className={`${showBestResearch ? 'text-yellow-300' : 'text-yellow-500'}`} 
+                size={22} 
+              />
+              <span>{showBestResearch ? 'All' : 'Best'}</span>
+              {!showBestResearch && bestPapersCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {bestPapersCount}
+                </span>
+              )}
             </button>
           )}
         </div>
@@ -210,8 +227,9 @@ export default function Dashboard() {
                 setSearchQuery('');
                 if (showBestResearch) setShowBestResearch(false);
               }}
-              className="px-6 py-3 bg-red-900 text-white rounded-lg hover:bg-red-800 transition-colors"
+              className="px-6 py-3 bg-red-900 text-white rounded-lg hover:bg-red-800 transition-colors flex items-center gap-2"
             >
+              <Filter size={18} />
               Reset Filters
             </button>
           </div>
