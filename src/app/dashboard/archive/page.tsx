@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { FiSearch, FiClock, FiArchive, FiRotateCw } from 'react-icons/fi';
+import { FiSearch, FiClock, FiArchive, FiRotateCw, FiTrash } from 'react-icons/fi';
 import StudyCard from '@/app/dashboard/(components)/card';
 
 interface ArchivedStudy {
@@ -126,14 +126,15 @@ export default function ArchivePage() {
           <div className="flex gap-3">
             <button
               onClick={restoreStudies}
-              className="flex items-center px-4 py-2 bg-[#292F36] text-white rounded-md hover:bg-[#1a1f24]"
+              className="cursor-pointer font-semibold flex items-center px-4 py-2 bg-[#292F36] text-white rounded-md hover:bg-[#1a1f24]"
             >
               <FiRotateCw className="mr-2" /> Restore
             </button>
             <button
               onClick={deletePermanently}
-              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+              className="cursor-pointer font-semibold flex items-center px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
             >
+              <FiTrash className="mr-2" />
               Delete Permanently
             </button>
           </div>
