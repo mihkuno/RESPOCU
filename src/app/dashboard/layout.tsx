@@ -16,6 +16,7 @@ import LogoutModal from '@/component/logoutModal';
 // Parent layout component
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [activeMenuItem, setActiveMenuItem] = useState('Home'); // State to track active menu item
 
   // Brand colors matching landing page
   const brandMaroon = '#9F1E22';
@@ -48,10 +49,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className="absolute bottom-20 right-20 w-64 h-64 border-2 border-red-900 rounded-full opacity-5"></div>
       </div>
 
-      <Sidebar onLogoutClick={() => setIsLogoutModalOpen(true)} />
+      <Sidebar onLogoutClick={() => setIsLogoutModalOpen(true)} setActiveMenuItem={setActiveMenuItem} activeMenuItem={activeMenuItem}/>
       <main className="flex-1 overflow-auto relative">
         <div className="relative z-10">
-          {children}
+          
+          <div className="min-h-screen p-18">
+            <div className="container mx-auto">
+              <header className="mb-10">
+                <div className="bg-gradient-to-r from-red-900 to-red-800 h-2 w-24 mb-4"></div>
+                <h1 className="text-3xl font-bold text-gray-900">
+                  {activeMenuItem} <span className="text-red-900">Dashboard</span>
+                </h1>
+                <p className="text-gray-600 mt-2">
+                  Manage and explore your academic research collection
+                </p>
+              </header>
+
+              {children}
+            </div>
+          </div>
+
         </div>
       </main>
       
@@ -65,7 +82,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 }
 
 // Sidebar component with logout modal integration
-function Sidebar({ onLogoutClick }: { onLogoutClick: () => void }) {
+function Sidebar({ onLogoutClick, setActiveMenuItem, activeMenuItem }: { onLogoutClick: () => void, setActiveMenuItem: (item: string) => void, activeMenuItem: string }) {
   // Brand colors matching landing page
   const brandMaroon = '#9F1E22';
   const brandYellow = '#FFB81C';
@@ -78,8 +95,6 @@ function Sidebar({ onLogoutClick }: { onLogoutClick: () => void }) {
     { name: 'User', icon: UserIcon, href: '/dashboard/users' },
   ];
   
-  // Active state for menu styling demonstration
-  const [activeItem, setActiveItem] = useState('Home');
 
   return (
     <div 
@@ -107,10 +122,10 @@ function Sidebar({ onLogoutClick }: { onLogoutClick: () => void }) {
           <ul className="space-y-2">
             {menuItems.map((item) => (
               <li key={item.name}>
-                <Link href={item.href} onClick={() => setActiveItem(item.name)}>
+                <Link href={item.href} onClick={() => setActiveMenuItem(item.name)}>
                   <div 
                     className={`flex items-center p-3 rounded-lg transition-colors font-semibold ${
-                      activeItem === item.name
+                      activeMenuItem === item.name
                         ? `bg-red-900 text-white`
                         : `text-gray-700 hover:bg-red-50 hover:text-red-900`
                     }`}

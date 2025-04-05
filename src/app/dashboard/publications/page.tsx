@@ -170,9 +170,7 @@ export default function CreateStudyPage() {
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Create New Study</h1>
-
+    <>
       <form onSubmit={handleSubmit} className="bg-white bg-opacity-90 rounded-lg shadow-md p-6">
         {/* Title */}
         <div className="mb-6">
@@ -363,6 +361,6 @@ export default function CreateStudyPage() {
           ))}
         </div>
       </div>
-    </div>
+    </>
   );
 }

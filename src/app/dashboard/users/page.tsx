@@ -66,9 +66,7 @@ export default function UsersPage() {
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">User Management</h1>
-      
+    <>
       {/* Search Bar */}
       <div className="mb-6 relative">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -147,6 +145,6 @@ export default function UsersPage() {
           </tbody>
         </table>
       </div>
-    </div>
+    </>
   );
 }

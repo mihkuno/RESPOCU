@@ -282,18 +282,7 @@ export default function Dashboard() {
   const bestPapersCount = studies.filter(study => study.isBestPaper).length;
 
   return (
-    <div className="min-h-screen p-4">
-      <div className="container mx-auto px-4 py-8">
-        <header className="mb-10">
-          <div className="bg-gradient-to-r from-red-900 to-red-800 h-2 w-24 mb-4"></div>
-          <h1 className="text-3xl font-bold text-gray-900">
-            Research <span className="text-red-900">Dashboard</span>
-          </h1>
-          <p className="text-gray-600 mt-2">
-            Manage and explore your academic research collection
-          </p>
-        </header>
-
+    <>
         <div className="flex flex-col sm:flex-row gap-4 mb-8 flex-wrap">
           <div className="relative flex-grow">
             <input
@@ -488,7 +477,6 @@ export default function Dashboard() {
             </button>
           </div>
         )}
-      </div>
-    </div>
+      </>
   );
 }

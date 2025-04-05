@@ -98,15 +98,7 @@ export default function ArchivePage() {
   };
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800 flex items-center">
-          <FiArchive className="mr-2" /> Study Archive
-        </h1>
-        <div className="text-sm text-gray-500">
-          {archivedStudies.length} archived studies
-        </div>
-      </div>
+    <>
 
       <div className="flex flex-col md:flex-row justify-between gap-4 mb-6">
         <div className="relative flex-grow max-w-md">
@@ -120,6 +112,10 @@ export default function ArchivePage() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
+        </div>
+
+        <div className="text-sm text-gray-500">
+          {archivedStudies.length} archived studies
         </div>
 
         {selectedStudies.length > 0 && (
@@ -176,6 +172,6 @@ export default function ArchivePage() {
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 }
