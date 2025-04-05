@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from 'react';
-import { Search, ChevronsUpDown, Award, Filter, ChevronDown, TestTube, Book, FileSpreadsheet, LineChart, Users, FlaskConical, BookOpen, Clock, Globe, Layers, Settings, Heart, Leaf, Cpu, DollarSign, GraduationCap, UserRound, Rocket } from 'lucide-react';
+import { Search, ChevronsUpDown, Award, Filter, ChevronDown, TestTube, Book, FileText, FileSpreadsheet, LineChart, Users, FlaskConical, BookOpen, Clock, Globe, Layers, Settings, Heart, Leaf, Cpu, DollarSign, GraduationCap, UserRound, Rocket, FileMinus2 } from 'lucide-react';
 import StudyCard from '@/app/dashboard/(components)/card';
 import { useRouter } from 'next/navigation';
 
@@ -132,6 +132,7 @@ export default function Dashboard() {
   ];
 
   const typeOptions = [
+    "Capstone Research",
     "Qualitative Research",
     "Quantitative Research",
     "Experimental Research",
@@ -154,10 +155,11 @@ export default function Dashboard() {
   const getTypeIcon = (type: string) => {
     // ... (your getTypeIcon function)
     switch (type) {
+      case "Capstone Research": return <FileMinus2 size={18} />;
       case "Qualitative Research": return <Users size={18} />;
       case "Quantitative Research": return <FileSpreadsheet size={18} />;
       case "Experimental Research": return <TestTube size={18} />;
-      case "Descriptive Research": return <Book size={18} />;
+      case "Descriptive Research": return <FileText size={18} />;
       case "Correlational Research": return <LineChart size={18} />;
       case "Action Research": return <Settings size={18} />;
       case "Case Study Research": return <BookOpen size={18} />;
