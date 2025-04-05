@@ -1,5 +1,13 @@
 "use client";
 
+import { addBookmark } from '@/actions/study';
+import { removeBookmark } from '@/actions/study';
+import { storeArchive } from '@/actions/study';
+import { restoreArchive } from '@/actions/study';
+import { deleteStudy } from '@/actions/study';
+import { markBestPaper } from '@/actions/study';
+import { unmarkBestPaper } from '@/actions/study';
+
 import React from 'react';
 import { 
   Bookmark, 
@@ -14,8 +22,7 @@ import {
   User,
   Users
 } from 'lucide-react';
-import mongoose from 'mongoose';
-
+import { useProfile } from '@/providers/profileContext';
 
 interface Study {
   id: string;
@@ -25,40 +32,91 @@ interface Study {
   publishedDate: string;
   authors: string[];
   publishedBy: string;
-  categories: string[]; // Renamed 'tags' to 'categories'
+  categories: string[];
   isArchived: boolean;
   isBestPaper: boolean;
+  isBookmarked: boolean;
 }
 
 interface StudyCardProps {
   study: Study;
-  isBookmarked: boolean;
+  setStudies: React.Dispatch<React.SetStateAction<Study[]>>;
   isAdmin: boolean;
-  isDashboard: boolean;
-  onToggleBookmark: (studyId: string) => void;
-  onArchive?: (studyId: string) => void;
-  onDelete?: (studyId: string) => void;
-  onEdit?: (studyId: string) => void;
-  onMarkBestPaper?: (studyId: string, status: boolean) => void;
-  onClick?: (studyId: string) => void;
 }
 
-const StudyCard: React.FC<StudyCardProps> = ({ 
-  study, 
-  isBookmarked = false,
-  isAdmin = false,
-  isDashboard = false,
-  onToggleBookmark,
-  onArchive,
-  onDelete,
-  onEdit,
-  onMarkBestPaper,
-  onClick
-}) => {
-  const handleCardClick = () => {
-    if (onClick) {
-      onClick(study.id);
+export default function StudyCard({ study, setStudies }: StudyCardProps) { 
+
+  const { profile } = useProfile();
+  const { email, isAdmin } = profile;
+
+  const onToggleBookmark = async (studyId: string) => {
+    setStudies((prevStudies) => {
+      return prevStudies.map((s: Study) => {
+        if (s.id === studyId) {
+          return { ...s, isBookmarked: !s.isBookmarked };
+        }
+        return s;
+      });
+    });
+
+    // Toggle bookmark in the database
+    if (study.isBookmarked) {
+      await removeBookmark(studyId, email);
+    } else {
+      await addBookmark(studyId, email);
     }
+  }
+  
+  const onArchive = async (studyId: string) => {
+    setStudies((prevStudies) => {
+      return prevStudies.map((s: Study) => {
+        if (s.id === studyId) {
+          return { ...s, isArchived: !s.isArchived };
+        }
+        return s;
+      });
+    });
+
+    // Toggle archive in the database
+    if (study.isArchived) {
+      await restoreArchive(studyId);
+    } else {
+      await storeArchive(studyId);
+    }
+  }
+
+  const onDelete = async (studyId: string) => {
+    setStudies((prevStudies) => {
+      return prevStudies.filter((s: Study) => s.id !== studyId);
+    });
+    // Delete study from the database
+    await deleteStudy(studyId);
+  }
+
+  const onMarkBestPaper = async (studyId: string, status: boolean) => {
+    setStudies((prevStudies) => {
+      return prevStudies.map((s: Study) => {
+        if (s.id === studyId) {
+          return { ...s, isBestPaper: status };
+        }
+        return s;
+      });
+    });
+    // Toggle best paper status in the database
+    if (study.isBestPaper) {
+      await unmarkBestPaper(studyId);
+    }
+    else {
+      await markBestPaper(studyId);
+    }
+  }
+  
+  const onEdit = async (studyId: string) => {
+    // Implement edit functionality here
+  }
+
+  const onClick = async (studyId: string) => {
+    // Implement click functionality here
   };
 
   const formattedDate = new Date(study.publishedDate).toLocaleDateString('en-US', {
@@ -93,7 +151,7 @@ const StudyCard: React.FC<StudyCardProps> = ({
         transition-all duration-300 ease-in-out transform hover:-translate-y-1 
         border ${colors.border} overflow-hidden cursor-pointer relative
         flex flex-col h-full`}
-      onClick={handleCardClick}
+      onClick={() => onClick(study.id)}
       aria-label={`Study: ${study.title}`}
       role="article"
     >
@@ -182,17 +240,21 @@ const StudyCard: React.FC<StudyCardProps> = ({
                     onToggleBookmark(study.id);
                   }}
                   className={`p-2 hover:bg-gray-100 rounded-full transition-colors`}
-                  title={isBookmarked ? "Remove bookmark" : "Bookmark"}
-                  aria-label={isBookmarked ? "Remove bookmark" : "Bookmark this study"}
+                  title={study.isBookmarked ? "Remove bookmark" : "Bookmark"}
+                  aria-label={study.isBookmarked ? "Remove bookmark" : "Bookmark this study"}
                 >
-                  {isBookmarked ? (
+                  {study.isBookmarked ? (
                     <BookmarkMinus className="text-red-600" size={18} />
                   ) : (
                     <Bookmark className="text-gray-600" size={18} />
                   )}
                 </button>
-                
-                <button 
+              </>
+            )}
+
+            {!study.isArchived && isAdmin && (
+              <>
+              <button 
                   onClick={(e) => {
                     e.stopPropagation();
                     if (onArchive) onArchive(study.id);
@@ -246,7 +308,7 @@ const StudyCard: React.FC<StudyCardProps> = ({
               </>
             )}
             
-            {isAdmin && isDashboard && (
+            {isAdmin && (
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
@@ -256,7 +318,7 @@ const StudyCard: React.FC<StudyCardProps> = ({
                 title={study.isBestPaper ? "Remove best paper mark" : "Mark as best paper"}
                 aria-label={study.isBestPaper ? "Remove best paper mark" : "Mark as best paper"}
               >
-                <Star className={study.isBestPaper ? "text-amber-500" : "text-gray-400"} size={18} />
+                <Star className={study.isBestPaper ? "text-amber-500" : "text-gray-600"} size={18} />
               </button>
             )}
           </div>
@@ -265,5 +327,3 @@ const StudyCard: React.FC<StudyCardProps> = ({
     </div>
   );
 };
-
-export default StudyCard;
