@@ -14,21 +14,17 @@ import {
   User,
   Users
 } from 'lucide-react';
+import mongoose from 'mongoose';
 
-interface Author {
-  id: number;
-  name: string;
-  role: 'student' | 'faculty';
-}
 
 interface Study {
-  id: number;
+  id: string;
   title: string;
   description: string;
   type: string;
   publishedDate: string;
-  authors: Author[];
-  publishedBy: Author;
+  authors: string[];
+  publishedBy: string;
   categories: string[]; // Renamed 'tags' to 'categories'
   isArchived: boolean;
   isBestPaper: boolean;
@@ -39,12 +35,12 @@ interface StudyCardProps {
   isBookmarked: boolean;
   isAdmin: boolean;
   isDashboard: boolean;
-  onToggleBookmark: (studyId: number) => void;
-  onArchive?: (studyId: number) => void;
-  onDelete?: (studyId: number) => void;
-  onEdit?: (studyId: number) => void;
-  onMarkBestPaper?: (studyId: number, status: boolean) => void;
-  onClick?: (studyId: number) => void;
+  onToggleBookmark: (studyId: string) => void;
+  onArchive?: (studyId: string) => void;
+  onDelete?: (studyId: string) => void;
+  onEdit?: (studyId: string) => void;
+  onMarkBestPaper?: (studyId: string, status: boolean) => void;
+  onClick?: (studyId: string) => void;
 }
 
 const StudyCard: React.FC<StudyCardProps> = ({ 
@@ -65,8 +61,6 @@ const StudyCard: React.FC<StudyCardProps> = ({
     }
   };
 
-  const studentAuthors = study.authors.filter(author => author.role === 'student');
-  const facultyPublisher = study.publishedBy;
   const formattedDate = new Date(study.publishedDate).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
@@ -161,13 +155,13 @@ const StudyCard: React.FC<StudyCardProps> = ({
           <div className="flex items-center">
             <Users size={16} className="mr-2 text-gray-400" />
             <span className="font-medium mr-1">Authors:</span>
-            <span>{studentAuthors.map(author => author.name).join(', ')}</span>
+            <span>{study.authors.join(', ')}</span>
           </div>
           
           <div className="flex items-center">
             <User size={16} className="mr-2 text-gray-400" />
             <span className="font-medium mr-1">Published by:</span>
-            <span>{facultyPublisher.name}</span>
+            <span>{study.publishedBy}</span>
           </div>
           
           <div className="flex items-center">
@@ -241,7 +235,7 @@ const StudyCard: React.FC<StudyCardProps> = ({
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
-                  if (onArchive) onArchive(study.id);
+                  if (onDelete) onDelete(study.id);
                 }}
                 className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                 title="Delete Permanently"
