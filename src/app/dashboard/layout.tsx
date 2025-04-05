@@ -12,6 +12,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { ArrowRightOnRectangleIcon as LogoutIcon } from '@heroicons/react/24/outline';
 import LogoutModal from '@/component/logoutModal'; 
+import { useProfile } from '@/providers/profileContext';
 
 // Parent layout component
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -83,22 +84,30 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 // Sidebar component with logout modal integration
 function Sidebar({ onLogoutClick, setActiveMenuItem, activeMenuItem }: { onLogoutClick: () => void, setActiveMenuItem: (item: string) => void, activeMenuItem: string }) {
+  
+  const { profile } = useProfile();
+  const { isAdmin } = profile;
+  
   // Brand colors matching landing page
   const brandMaroon = '#9F1E22';
   const brandYellow = '#FFB81C';
 
-  const menuItems = [
-    { name: 'Home', icon: HomeIcon, href: '/dashboard' },
-    { name: 'Publications', icon: BookOpenIcon, href: '/dashboard/publications' },
-    { name: 'Archive', icon: ArchiveBoxIcon, href: '/dashboard/archive' },
-    { name: 'User', icon: UserIcon, href: '/dashboard/users' },
-  ];
-  
+  let menuItems;
+  if (isAdmin) {
+    menuItems = [
+      { name: 'Home', icon: HomeIcon, href: '/dashboard' },
+      { name: 'Publications', icon: BookOpenIcon, href: '/dashboard/publications' },
+      { name: 'Archive', icon: ArchiveBoxIcon, href: '/dashboard/archive' },
+      { name: 'Accounts', icon: UserIcon, href: '/dashboard/users' },
+    ];
+  } else {
+    menuItems = [
+      { name: 'Home', icon: HomeIcon, href: '/dashboard' },
+    ];
+  }
 
   return (
-    <div 
-      className="w-64 flex flex-col justify-between shadow-lg relative z-20 bg-white border-r border-gray-200"
-    >
+    <div className="w-64 flex flex-col justify-between shadow-lg relative z-20 bg-white border-r border-gray-200">
       <div>
         {/* Logo with brand-colored accent */}
         <div className="p-4 border-b border-gray-200 relative">
