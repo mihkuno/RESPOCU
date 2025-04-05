@@ -2,24 +2,26 @@ import mongoose from "mongoose";
 
 // Extend globalThis to include mongoose cache
 declare global {
-  var mongooseCache: { conn: mongoose.Connection | null; promise: Promise<mongoose.Connection> | null };
+  var mongoose: { conn: mongoose.Connection | null; promise: Promise<typeof mongoose> | null };
 }
 
 // Ensure global cache is preserved across hot reloads in development
-global.mongooseCache = global.mongooseCache || { conn: null, promise: null };
+let cached = global.mongoose || (global.mongoose = { conn: null, promise: null });
+
+if (!process.env.MONGO_URI) {
+  throw new Error("❌ process.env.MONGO_URI is not defined in environment variables.");
+}
 
 export async function connectDatabase() {
-  if (global.mongooseCache.conn) return global.mongooseCache.conn;
+  if (cached.conn) return cached.conn;
 
-  if (!global.mongooseCache.promise) {
-    if (!process.env.MONGO_URI) {
-      throw new Error("MONGO_URI is not defined in environment variables");
-    }
-
-    global.mongooseCache.promise = mongoose.connect(process.env.MONGO_URI)
-    .then((mongooseInstance) => mongooseInstance.connection);
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(process.env.MONGO_URI as string)
+    .then((mongooseInstance) => {
+      return { conn: mongooseInstance.connection, promise: cached.promise };
+    });
   }
 
-  global.mongooseCache.conn = await global.mongooseCache.promise;
-  return global.mongooseCache.conn;
+  cached.conn = (await cached.promise).conn;
+  return cached.conn;
 }
