@@ -1,10 +1,13 @@
+import { sign } from "crypto";
 import mongoose from "mongoose";
 
 const schema = new mongoose.Schema({
-    pdf: {
-        type: Buffer,
-        contentType: "application/pdf",
-        required: true,
+    file: {
+        name: { type: String, required: true },
+        size: { type: Number, required: true },
+        type: { type: String, required: true },
+        data: { type: Buffer, required: true },
+        last_modified: { type: Number, required: true },
     },
     title: { 
         type: String, 
@@ -15,9 +18,14 @@ const schema = new mongoose.Schema({
         type: String, 
         required: true 
     },
-    keywords: { 
+    categories: { 
         type: [String], 
         required: true 
+    },
+    research_type: {
+        type: String,
+        // enum: ["research", "publication"],
+        required: true,
     },
     authors: { 
         type: [String], 
@@ -25,14 +33,18 @@ const schema = new mongoose.Schema({
     },
     publisher: {
         type: [mongoose.Schema.Types.ObjectId],
-        ref: "Research",
+        ref: "Account",
         required: true,
     },
-    is_archived: {
+    bookmarked_by: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: "Account",
+    },
+    is_best: {
         type: Boolean,
         default: false,
     },
-    is_published: {
+    is_archived: {
         type: Boolean,
         default: false,
     },
