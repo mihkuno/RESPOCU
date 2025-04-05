@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { Search, ChevronsUpDown, Award, Filter, Bookmark, ChevronDown, TestTube, Book, FileText, FileSpreadsheet, LineChart, Users, FlaskConical, BookOpen, Clock, Globe, Layers, Settings, Heart, Leaf, Cpu, DollarSign, GraduationCap, UserRound, Rocket, FileMinus2 } from 'lucide-react';
 import StudyCard from '@/app/dashboard/(components)/card';
 import { useRouter } from 'next/navigation';
+import { useProfile } from '@/providers/profileContext';
 
 interface Study {
   id: string;
@@ -28,9 +29,10 @@ export default function Home({ studyData }: { studyData: Study[] }) {
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState<boolean>(false);
   const [isTypeDropdownOpen, setIsTypeDropdownOpen] = useState<boolean>(false);
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState<boolean>(false);
-  const isAdmin = true;
+  const [studies, setStudies] = useState<Study[]>(studyData);
+  const { profile } = useProfile();
+  const { isAdmin } = profile;
 
-  const [studies, setStudies] = useState<Study[]>(studyData || []);
 
   const categoryOptions = [
     "Health & Wellness",
@@ -120,37 +122,6 @@ export default function Home({ studyData }: { studyData: Study[] }) {
       });
   }, [searchQuery, sortBy, categoryFilter, typeFilter, studies]);
 
-  const toggleBookmark = (studyId: string): void => {
-    setStudies(prevStudies => {
-      return prevStudies.map(study =>
-        study.id === studyId
-          ? { ...study, isBookmarked: !study.isBookmarked }
-          : study
-      );
-    });
-  };
-
-  const handleArchive = (studyId: string): void => {
-    alert(`Archive study with ID: ${studyId}`);
-  };
-
-  const handleDelete = (studyId: string): void => {
-    alert(`Delete study with ID: ${studyId}`);
-  };
-
-  const handleEdit = (studyId: string): void => {
-    router.push(`/studies/${studyId}/edit`);
-  };
-
-  const handleMarkBestPaper = (studyId: string, status: boolean): void => {
-    setStudies(prevStudies => {
-      return prevStudies.map(study => study.id === studyId ? { ...study, isBestPaper: status } : study)
-    });
-  };
-
-  const handleCardClick = (studyId: string): void => {
-    router.push(`/studies/${studyId}`);
-  };
 
   const selectCategory = (category: string) => {
     setCategoryFilter(category);
@@ -231,126 +202,123 @@ export default function Home({ studyData }: { studyData: Study[] }) {
           )}
         </div>
 
-        {isAdmin && (
-          <>
-            <div className="relative">
-              <button
-                className="flex items-center justify-between gap-2 px-4 py-3 w-48 rounded-lg border border-slate-200 bg-white text-gray-700 hover:bg-slate-50 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-900"
-                onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
-                aria-haspopup="true"
-                aria-expanded={isCategoryDropdownOpen}
-              >
-                <div className="flex items-center gap-2">
-                  {categoryFilter === 'best' && (
-                    <Award className="text-yellow-500" size={20} />
-                  )}
-                  {categoryFilter === 'bookmarks' && (
-                    <Bookmark className="text-blue-500" size={20} />
-                  )}
-                  {categoryFilter !== 'all' && categoryFilter !== 'best' && categoryFilter !== 'bookmarks' && (
-                    getCategoryIcon(categoryFilter)
-                  )}
-                  <span>{getCurrentCategoryDisplay()}</span>
-                </div>
-                <ChevronDown size={18} className={`transition-transform duration-300 ${isCategoryDropdownOpen ? 'rotate-180' : ''}`} />
-              </button>
-
-              {isCategoryDropdownOpen && (
-                <div className="absolute z-10 mt-1 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-                  <div className="py-1" role="menu" aria-orientation="vertical">
-                    <button
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-slate-100 flex items-center gap-2"
-                      onClick={() => selectCategory('all')}
-                      role="menuitem"
-                    >
-                      All Categories
-                    </button>
-                    <button
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-slate-100 flex items-center gap-2"
-                      onClick={() => selectCategory('best')}
-                      role="menuitem"
-                    >
-                      <Award className="text-yellow-500" size={18} />
-                      Best Papers
-                      {bestPapersCount > 0 && (
-                        <span className="ml-auto bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                          {bestPapersCount}
-                        </span>
-                      )}
-                    </button>
-                    <button
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-slate-100 flex items-center gap-2"
-                      onClick={() => selectCategory('bookmarks')}
-                      role="menuitem"
-                    >
-                      <Bookmark className="text-blue-500" size={18} />
-                      Bookmarks
-                      {bookmarksCount > 0 && (
-                        <span className="ml-auto bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                          {bookmarksCount}
-                        </span>
-                      )}
-                    </button>
-                    <div className="border-t border-slate-200 my-1"></div>
-                    {categoryOptions.map(category => (
-                      <button
-                        key={category}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-slate-100 flex items-center gap-2"
-                        onClick={() => selectCategory(category)}
-                        role="menuitem"
-                      >
-                        {getCategoryIcon(category)}
-                        {category}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+      
+        <div className="relative">
+          <button
+            className="flex items-center justify-between gap-2 px-4 py-3 w-48 rounded-lg border border-slate-200 bg-white text-gray-700 hover:bg-slate-50 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-900"
+            onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
+            aria-haspopup="true"
+            aria-expanded={isCategoryDropdownOpen}
+          >
+            <div className="flex items-center gap-2">
+              {categoryFilter === 'best' && (
+                <Award className="text-yellow-500" size={20} />
               )}
-            </div>
-
-            <div className="relative">
-              <button
-                className="flex items-center justify-between gap-2 px-4 py-3 w-48 rounded-lg border border-slate-200 bg-white text-gray-700 hover:bg-slate-50 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-900"
-                onClick={() => setIsTypeDropdownOpen(!isTypeDropdownOpen)}
-                aria-haspopup="true"
-                aria-expanded={isTypeDropdownOpen}
-              >
-                <div className="flex items-center gap-2">
-                  {typeFilter !== 'all' && getTypeIcon(typeFilter)}
-                  <span>{getCurrentTypeDisplay()}</span>
-                </div>
-                <ChevronDown size={18} className={`transition-transform duration-300 ${isTypeDropdownOpen ? 'rotate-180' : ''}`} />
-              </button>
-
-              {isTypeDropdownOpen && (
-                <div className="absolute z-10 mt-1 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-                  <div className="py-1" role="menu" aria-orientation="vertical">
-                    <button
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-slate-100 flex items-center gap-2"
-                      onClick={() => selectType('all')}
-                      role="menuitem"
-                    >
-                      All Types
-                    </button>
-                    <div className="border-t border-slate-200 my-1"></div>
-                    {typeOptions.map(type => (
-                      <button
-                        key={type}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-slate-100 flex items-center gap-2"
-                        onClick={() => selectType(type)}
-                        role="menuitem"
-                      >
-                        {getTypeIcon(type)}
-                        {type}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+              {categoryFilter === 'bookmarks' && (
+                <Bookmark className="text-blue-500" size={20} />
               )}
+              {categoryFilter !== 'all' && categoryFilter !== 'best' && categoryFilter !== 'bookmarks' && (
+                getCategoryIcon(categoryFilter)
+              )}
+              <span>{getCurrentCategoryDisplay()}</span>
             </div>
-          </>
-        )}
-      </div>
+            <ChevronDown size={18} className={`transition-transform duration-300 ${isCategoryDropdownOpen ? 'rotate-180' : ''}`} />
+          </button>
+
+          {isCategoryDropdownOpen && (
+            <div className="absolute z-10 mt-1 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <div className="py-1" role="menu" aria-orientation="vertical">
+                <button
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-slate-100 flex items-center gap-2"
+                  onClick={() => selectCategory('all')}
+                  role="menuitem"
+                >
+                  All Categories
+                </button>
+                <button
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-slate-100 flex items-center gap-2"
+                  onClick={() => selectCategory('best')}
+                  role="menuitem"
+                >
+                  <Award className="text-yellow-500" size={18} />
+                  Best Papers
+                  {bestPapersCount > 0 && (
+                    <span className="ml-auto bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                      {bestPapersCount}
+                    </span>
+                  )}
+                </button>
+                <button
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-slate-100 flex items-center gap-2"
+                  onClick={() => selectCategory('bookmarks')}
+                  role="menuitem"
+                >
+                  <Bookmark className="text-blue-500" size={18} />
+                  Bookmarks
+                  {bookmarksCount > 0 && (
+                    <span className="ml-auto bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                      {bookmarksCount}
+                    </span>
+                  )}
+                </button>
+                <div className="border-t border-slate-200 my-1"></div>
+                {categoryOptions.map(category => (
+                  <button
+                    key={category}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-slate-100 flex items-center gap-2"
+                    onClick={() => selectCategory(category)}
+                    role="menuitem"
+                  >
+                    {getCategoryIcon(category)}
+                    {category}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="relative">
+          <button
+            className="flex items-center justify-between gap-2 px-4 py-3 w-48 rounded-lg border border-slate-200 bg-white text-gray-700 hover:bg-slate-50 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-900"
+            onClick={() => setIsTypeDropdownOpen(!isTypeDropdownOpen)}
+            aria-haspopup="true"
+            aria-expanded={isTypeDropdownOpen}
+          >
+            <div className="flex items-center gap-2">
+              {typeFilter !== 'all' && getTypeIcon(typeFilter)}
+              <span>{getCurrentTypeDisplay()}</span>
+            </div>
+            <ChevronDown size={18} className={`transition-transform duration-300 ${isTypeDropdownOpen ? 'rotate-180' : ''}`} />
+          </button>
+
+          {isTypeDropdownOpen && (
+            <div className="absolute z-10 mt-1 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <div className="py-1" role="menu" aria-orientation="vertical">
+                <button
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-slate-100 flex items-center gap-2"
+                  onClick={() => selectType('all')}
+                  role="menuitem"
+                >
+                  All Types
+                </button>
+                <div className="border-t border-slate-200 my-1"></div>
+                {typeOptions.map(type => (
+                  <button
+                    key={type}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-slate-100 flex items-center gap-2"
+                    onClick={() => selectType(type)}
+                    role="menuitem"
+                  >
+                    {getTypeIcon(type)}
+                    {type}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+    </div>
 
       {filteredStudies.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -358,15 +326,8 @@ export default function Home({ studyData }: { studyData: Study[] }) {
             <StudyCard
               key={study.id.toString()} // Convert ObjectId to string for the key
               study={study}
-              isBookmarked={study.isBookmarked}
+              setStudies={setStudies}
               isAdmin={isAdmin}
-              isDashboard={true}
-              onToggleBookmark={toggleBookmark}
-              onArchive={handleArchive}
-              onDelete={handleDelete}
-              onEdit={handleEdit}
-              onMarkBestPaper={handleMarkBestPaper}
-              onClick={handleCardClick}
             />
           ))}
         </div>

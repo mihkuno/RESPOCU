@@ -2,24 +2,34 @@
 
 import React from 'react';
 import Home from './page';
+import { connectDatabase } from "@/lib/database";
+import Research from "@/models/Research";
 
 
-export default function HomeLayout() {
+export default async function HomeLayout() {
  
- 
-    // {
-    //     id: 6,
-    //     title: "The Economics of Digital Marketing",
-    //     description: "Analyzing the economic impact of digital marketing strategies on small businesses.",
-    //     type: "Mixed-Methods Research",
-    //     publishedDate: "2024-01-15",
-    //     authors: [{ id: 109, name: "Laura Kim", role: "student" }],
-    //     publishedBy: { id: 206, name: "Prof. John Smith", role: "faculty" },
-    //     categories: ["Economics & Development", "Technology & Innovation"],
-    //     isArchived: false,
-    //     isBestPaper: true,
-    //     isBookmarked: false
-    //   },
- 
-    return <Home studyData={[]} />;
+    // TODO: get the email from the headers
+    const email = "caindayjoeninyo@gmail.com";
+
+    await connectDatabase();
+    
+    // get the studies that are not archived
+    let studies = await Research.find({ is_archived: false }).select("-file");
+    if (studies) {
+        studies = studies.map((study) => ({
+            id: study._id.toString(),
+            title: study.title,
+            description: study.description,
+            categories: study.categories,
+            type: study.research_type,
+            authors: study.authors,
+            publishedBy: study.publisher,
+            publishedDate: study.created_at,
+            isBestPaper: study.is_best,
+            isArchived: study.is_archived,
+            isBookmarked: study.bookmarked_by.includes(email),
+        }));
+    }
+
+    return <Home studyData={studies} />;
 }
