@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from 'react';
-import { Search, ChevronsUpDown, Award, Filter, ChevronDown, TestTube, Book, FileText, FileSpreadsheet, LineChart, Users, FlaskConical, BookOpen, Clock, Globe, Layers, Settings, Heart, Leaf, Cpu, DollarSign, GraduationCap, UserRound, Rocket, FileMinus2 } from 'lucide-react';
+import { Search, ChevronsUpDown, Award, Filter, Bookmark, ChevronDown, TestTube, Book, FileText, FileSpreadsheet, LineChart, Users, FlaskConical, BookOpen, Clock, Globe, Layers, Settings, Heart, Leaf, Cpu, DollarSign, GraduationCap, UserRound, Rocket, FileMinus2 } from 'lucide-react';
 import StudyCard from '@/app/dashboard/(components)/card';
 import { useRouter } from 'next/navigation';
 
@@ -22,6 +22,7 @@ interface Study {
   categories: string[];
   isArchived: boolean;
   isBestPaper: boolean;
+  isBookmarked: boolean;
 }
 
 export default function Dashboard() {
@@ -37,7 +38,6 @@ export default function Dashboard() {
   const isAdmin = true;
 
   const [studies, setStudies] = useState<Study[]>([
-    // ... (your studies data)
     {
       id: 1,
       title: "The Impact of Social Media on Academic Performance",
@@ -51,7 +51,8 @@ export default function Dashboard() {
       publishedBy: { id: 201, name: "Dr. Robert Lee", role: "faculty" },
       categories: ["Education & Learning", "Technology & Innovation"],
       isArchived: false,
-      isBestPaper: true
+      isBestPaper: true,
+      isBookmarked: true
     },
     {
       id: 2,
@@ -66,7 +67,8 @@ export default function Dashboard() {
       publishedBy: { id: 202, name: "Dr. Anna Garcia", role: "faculty" },
       categories: ["Health & Wellness"],
       isArchived: true,
-      isBestPaper: false
+      isBestPaper: false,
+      isBookmarked: false
     },
     {
       id: 3,
@@ -81,7 +83,8 @@ export default function Dashboard() {
       publishedBy: { id: 203, name: "Dr. Michael Torres", role: "faculty" },
       categories: ["Sociology & Society", "Education & Learning"],
       isArchived: false,
-      isBestPaper: false
+      isBestPaper: false,
+      isBookmarked: false
     },
     {
       id: 4,
@@ -94,6 +97,7 @@ export default function Dashboard() {
       categories: ["Environment & Sustainability"],
       isArchived: false,
       isBestPaper: false,
+      isBookmarked: true
     },
     {
       id: 5,
@@ -106,6 +110,7 @@ export default function Dashboard() {
       categories: ["Technology & Innovation", "Health & Wellness"],
       isArchived: false,
       isBestPaper: true,
+      isBookmarked: false
     },
     {
       id: 6,
@@ -118,6 +123,7 @@ export default function Dashboard() {
       categories: ["Economics & Development", "Technology & Innovation"],
       isArchived: false,
       isBestPaper: true,
+      isBookmarked: false
     },
   ]);
 
@@ -146,14 +152,13 @@ export default function Dashboard() {
     "Developmental Research",
   ];
 
-    const sortOptions = [
-        { value: 'newest', label: 'Newest First' },
-        { value: 'oldest', label: 'Oldest First' },
-        { value: 'title', label: 'Title (A-Z)' },
-    ];
+  const sortOptions = [
+      { value: 'newest', label: 'Newest First' },
+      { value: 'oldest', label: 'Oldest First' },
+      { value: 'title', label: 'Title (A-Z)' },
+  ];
 
   const getTypeIcon = (type: string) => {
-    // ... (your getTypeIcon function)
     switch (type) {
       case "Capstone Research": return <FileMinus2 size={18} />;
       case "Qualitative Research": return <Users size={18} />;
@@ -172,7 +177,6 @@ export default function Dashboard() {
   };
 
   const getCategoryIcon = (category: string) => {
-    // ... (your getCategoryIcon function)
     switch (category) {
       case "Health & Wellness": return <Heart size={18} />;
       case "Environment & Sustainability": return <Leaf size={18} />;
@@ -186,7 +190,6 @@ export default function Dashboard() {
   };
 
   const filteredStudies = useMemo(() => {
-    // ... (your filteredStudies logic)
     return studies
       .filter(study => !study.isArchived)
       .filter(study => {
@@ -195,8 +198,11 @@ export default function Dashboard() {
           study.authors.some(author => author.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
           study.categories.some(category => category.toLowerCase().includes(searchQuery.toLowerCase()));
 
-        const matchesCategory = categoryFilter === 'all' ||
-          (categoryFilter === 'best' ? study.isBestPaper : study.categories.includes(categoryFilter));
+        const matchesCategory = 
+          categoryFilter === 'all' ? true :
+          categoryFilter === 'best' ? study.isBestPaper :
+          categoryFilter === 'bookmarks' ? study.isBookmarked :
+          study.categories.includes(categoryFilter);
 
         const matchesType = typeFilter === 'all' || study.type === typeFilter;
 
@@ -210,76 +216,70 @@ export default function Dashboard() {
   }, [searchQuery, sortBy, categoryFilter, typeFilter, studies]);
 
   const toggleBookmark = (studyId: number): void => {
-    // ... (your toggleBookmark function)
-    if (bookmarks.includes(studyId)) {
-      setBookmarks(bookmarks.filter(id => id !== studyId));
-    } else {
-      setBookmarks([...bookmarks, studyId]);
-    }
+    setStudies(prevStudies => {
+      return prevStudies.map(study => 
+        study.id === studyId 
+          ? { ...study, isBookmarked: !study.isBookmarked } 
+          : study
+      );
+    });
   };
 
   const handleArchive = (studyId: number): void => {
-    // ... (your handleArchive function)
     alert(`Archive study with ID: ${studyId}`);
   };
 
   const handleDelete = (studyId: number): void => {
-    // ... (your handleDelete function)
     alert(`Delete study with ID: ${studyId}`);
   };
 
   const handleEdit = (studyId: number): void => {
-    // ... (your handleEdit function)
     router.push(`/studies/${studyId}/edit`);
   };
 
   const handleMarkBestPaper = (studyId: number, status: boolean): void => {
-    // ... (your handleMarkBestPaper function)
     setStudies(prevStudies => {
       return prevStudies.map(study => study.id === studyId ? { ...study, isBestPaper: status } : study)
     });
   };
 
   const handleCardClick = (studyId: number): void => {
-    // ... (your handleCardClick function)
     router.push(`/studies/${studyId}`);
   };
 
   const selectCategory = (category: string) => {
-    // ... (your selectCategory function)
     setCategoryFilter(category);
     setIsCategoryDropdownOpen(false);
   };
 
   const selectType = (type: string) => {
-    // ... (your selectType function)
     setTypeFilter(type);
     setIsTypeDropdownOpen(false);
   };
 
-    const selectSort = (sortValue: string) => {
-        setSortBy(sortValue);
-        setIsSortDropdownOpen(false);
-    };
+  const selectSort = (sortValue: string) => {
+      setSortBy(sortValue);
+      setIsSortDropdownOpen(false);
+  };
 
   const getCurrentCategoryDisplay = () => {
-    // ... (your getCurrentCategoryDisplay function)
     if (categoryFilter === 'all') return 'All Categories';
     if (categoryFilter === 'best') return 'Best Papers';
+    if (categoryFilter === 'bookmarks') return 'Bookmarks';
     return categoryFilter;
   };
 
   const getCurrentTypeDisplay = () => {
-    // ... (your getCurrentTypeDisplay function)
     if (typeFilter === 'all') return 'All Types';
     return typeFilter;
   };
 
-    const getCurrentSortDisplay = () => {
-        return sortOptions.find(option => option.value === sortBy)?.label || 'Sort By';
-    };
+  const getCurrentSortDisplay = () => {
+      return sortOptions.find(option => option.value === sortBy)?.label || 'Sort By';
+  };
 
-  const bestPapersCount = studies.filter(study => study.isBestPaper).length;
+  const bestPapersCount = studies.filter(study => study.isBestPaper && !study.isArchived).length;
+  const bookmarksCount = studies.filter(study => study.isBookmarked && !study.isArchived).length;
 
   return (
     <>
@@ -329,7 +329,6 @@ export default function Dashboard() {
           {isAdmin && (
             <>
               <div className="relative">
-                {/* ... (your category filter dropdown) */}
                 <button
                     className="flex items-center justify-between gap-2 px-4 py-3 w-48 rounded-lg border border-slate-200 bg-white text-gray-700 hover:bg-slate-50 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-900"
                     onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
@@ -340,7 +339,10 @@ export default function Dashboard() {
                         {categoryFilter === 'best' && (
                             <Award className="text-yellow-500" size={20} />
                         )}
-                        {categoryFilter !== 'all' && categoryFilter !== 'best' && (
+                        {categoryFilter === 'bookmarks' && (
+                            <Bookmark className="text-blue-500" size={20} />
+                        )}
+                        {categoryFilter !== 'all' && categoryFilter !== 'best' && categoryFilter !== 'bookmarks' && (
                             getCategoryIcon(categoryFilter)
                         )}
                         <span>{getCurrentCategoryDisplay()}</span>
@@ -371,6 +373,19 @@ export default function Dashboard() {
                                     </span>
                                 )}
                             </button>
+                            <button
+                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-slate-100 flex items-center gap-2"
+                                onClick={() => selectCategory('bookmarks')}
+                                role="menuitem"
+                            >
+                                <Bookmark className="text-blue-500" size={18} />
+                                Bookmarks
+                                {bookmarksCount > 0 && (
+                                    <span className="ml-auto bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                                        {bookmarksCount}
+                                    </span>
+                                )}
+                            </button>
                             <div className="border-t border-slate-200 my-1"></div>
                             {categoryOptions.map(category => (
                                 <button
@@ -389,7 +404,6 @@ export default function Dashboard() {
               </div>
 
               <div className="relative">
-                {/* ... (your type filter dropdown) */}
                 <button
                     className="flex items-center justify-between gap-2 px-4 py-3 w-48 rounded-lg border border-slate-200 bg-white text-gray-700 hover:bg-slate-50 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-900"
                     onClick={() => setIsTypeDropdownOpen(!isTypeDropdownOpen)}
@@ -433,14 +447,13 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* ... (rest of your component) */}
         {filteredStudies.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredStudies.map((study) => (
               <StudyCard
                 key={study.id}
                 study={study}
-                isBookmarked={bookmarks.includes(study.id)}
+                isBookmarked={study.isBookmarked}
                 isAdmin={isAdmin}
                 isDashboard={true}
                 onToggleBookmark={toggleBookmark}
@@ -460,6 +473,8 @@ export default function Dashboard() {
             <p className="text-gray-600 mb-6">
               {categoryFilter === 'best'
                 ? "No best research studies match your search criteria"
+                : categoryFilter === 'bookmarks'
+                ? "You haven't bookmarked any studies yet"
                 : categoryFilter !== 'all' || typeFilter !== 'all'
                   ? `No studies found with the current filters`
                   : "Try adjusting your search query or explore different filters"}
@@ -477,6 +492,6 @@ export default function Dashboard() {
             </button>
           </div>
         )}
-      </>
+    </>
   );
 }
