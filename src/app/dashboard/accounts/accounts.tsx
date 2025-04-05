@@ -7,57 +7,23 @@ interface User {
   id: string;
   name: string;
   email: string;
-  studentId: string;
-  createdAt: string;
-  isAdmin: boolean;
+  created_at: string;
+  type: 'user' | 'admin';
 }
 
-export default function UsersPage() {
+export default function Accounts({ accountList }: { accountList: User[] }) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [users, setUsers] = useState<User[]>([
-    {
-      id: '1',
-      name: 'John Doe',
-      email: 'john.doe@example.com',
-      studentId: '20230001',
-      createdAt: '2023-01-15',
-      isAdmin: true
-    },
-    {
-      id: '2',
-      name: 'Jane Smith',
-      email: 'jane.smith@example.com',
-      studentId: '20230002',
-      createdAt: '2023-02-20',
-      isAdmin: false
-    },
-    {
-      id: '3',
-      name: 'Robert Johnson',
-      email: 'robert.j@example.com',
-      studentId: '20230003',
-      createdAt: '2023-03-10',
-      isAdmin: false
-    },
-    {
-      id: '4',
-      name: 'Sarah Williams',
-      email: 'sarah.w@example.com',
-      studentId: '20230004',
-      createdAt: '2023-04-05',
-      isAdmin: true
-    },
-  ]);
+  const [users, setUsers] = useState<User[]>(accountList || []);
 
   const filteredUsers = users.filter(user =>
     user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.studentId.toLowerCase().includes(searchTerm.toLowerCase())
+    user.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const toggleAdmin = (userId: string) => {
     setUsers(users.map(user =>
-      user.id === userId ? { ...user, isAdmin: !user.isAdmin } : user
+      user.id === userId ? { ...user, type: user.type === 'admin' ? 'user' : 'admin' } : user
     ));
   };
 
@@ -86,9 +52,9 @@ export default function UsersPage() {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Admin</th>
             </tr>
@@ -98,26 +64,26 @@ export default function UsersPage() {
               filteredUsers.map((user) => (
                 <tr key={user.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500">{user.id}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">{user.name}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-500">{user.email}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">{user.studentId}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-500">
-                      {new Date(user.createdAt).toLocaleDateString()}
+                      {new Date(user.created_at).toLocaleDateString()}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <button
                       onClick={() => toggleAdmin(user.id)}
                       className="text-gray-700 hover:text-[#292F36]"
-                      aria-label={user.isAdmin ? 'Revoke admin' : 'Make admin'}
+                      aria-label={user.type === 'admin' ? 'Revoke admin' : 'Make admin'}
                     >
-                      {user.isAdmin ? (
+                      {user.type === 'admin' ? (
                         <FiToggleRight className="h-5 w-5 text-green-500" />
                       ) : (
                         <FiToggleLeft className="h-5 w-5 text-gray-400" />

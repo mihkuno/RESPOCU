@@ -98,7 +98,7 @@ function Sidebar({ onLogoutClick, setActiveMenuItem, activeMenuItem }: { onLogou
       { name: 'Home', icon: HomeIcon, href: '/dashboard' },
       { name: 'Publications', icon: BookOpenIcon, href: '/dashboard/publications' },
       { name: 'Archive', icon: ArchiveBoxIcon, href: '/dashboard/archive' },
-      { name: 'Accounts', icon: UserIcon, href: '/dashboard/users' },
+      { name: 'Accounts', icon: UserIcon, href: '/dashboard/accounts' },
     ];
   } else {
     menuItems = [
