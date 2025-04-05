@@ -90,7 +90,6 @@ function Sidebar({ onLogoutClick, setActiveMenuItem, activeMenuItem }: { onLogou
   const menuItems = [
     { name: 'Home', icon: HomeIcon, href: '/dashboard' },
     { name: 'Publications', icon: BookOpenIcon, href: '/dashboard/publications' },
-    { name: 'Bookmark', icon: BookmarkIcon, href: '/dashboard/bookmarks' },
     { name: 'Archive', icon: ArchiveBoxIcon, href: '/dashboard/archive' },
     { name: 'User', icon: UserIcon, href: '/dashboard/users' },
   ];
@@ -144,7 +143,7 @@ function Sidebar({ onLogoutClick, setActiveMenuItem, activeMenuItem }: { onLogou
       <div className="p-4 border-t border-gray-200">
         <button
           onClick={onLogoutClick}
-          className="w-full flex items-center p-3 text-gray-700 hover:text-red-900 hover:bg-red-50 rounded-lg transition-colors"
+          className="cursor-pointer font-semibold w-full flex items-center p-3 text-gray-700 hover:text-red-900 hover:bg-red-50 rounded-lg transition-colors"
         >
           <LogoutIcon className="h-5 w-5 mr-3" />
           <span>Logout</span>
