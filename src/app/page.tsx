@@ -43,7 +43,7 @@ export default function LandingPage() {
                         <div>
                             <div className="bg-gradient-to-r from-red-900 to-red-800 h-2 w-24 mb-8"></div>
                             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-                                Capitol University <span className="text-red-900">Research Repository</span>
+                                EduChest <span className="text-red-900">Research Repository</span>
                             </h1>
                             <p className="text-xl text-gray-600 mb-8">
                                 Empowering Senior High Students with access to curated research papers and educational resources.
