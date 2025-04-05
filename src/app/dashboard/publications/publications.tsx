@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { FiTrash2, FiPlus, FiX, FiUpload } from 'react-icons/fi';
 import StudyCard from '@/app/dashboard/(components)/card';
 import { Search, ChevronsUpDown, Award, Filter, Bookmark, ChevronDown, TestTube, Book, FileText, FileSpreadsheet, LineChart, Users, FlaskConical, BookOpen, Clock, Globe, Layers, Settings, Heart, Leaf, Cpu, DollarSign, GraduationCap, UserRound, Rocket, FileMinus2, Edit, Save, FileUp, Paperclip, AlertTriangle, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
+import { useProfile } from '@/providers/profileContext';
 
 
 interface StudyFile {
@@ -25,7 +26,7 @@ interface Study {
   categories: string[];
   isArchived: boolean;
   isBestPaper: boolean;
-  isBookmarked?: boolean;
+  isBookmarked: boolean;
 }
 
 // Modal types
@@ -149,13 +150,13 @@ export default function Publications(
     studyDataToEdit,
     studyFileToEdit,
     publishAction, 
-    publishedStudies 
+    studies 
   }:
   { 
     studyDataToEdit?: Study,
     studyFileToEdit?: StudyFile,
-    publishAction: (formData: FormData) => Promise<void>,
-    publishedStudies: Study[]
+    publishAction: (formData: FormData) => Promise<string>,
+    studies: Study[]
   }) {
 
   const [study, setStudy] = useState<Study>(studyDataToEdit || {
@@ -173,12 +174,14 @@ export default function Publications(
   });
 
   const [newAuthor, setNewAuthor] = useState('');
-  const [isEditing, setIsEditing] = useState(studyDataToEdit && studyFileToEdit ? true : false);
+  const [isEditing, setIsEditing] = useState(study.id ? true : false);
   const [uploadedFile, setUploadedFile] = useState<StudyFile | null>(studyFileToEdit || null); // Changed to single file
   const [isDragging, setIsDragging] = useState(false);
   const [fileError, setFileError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+  const [publishedStudies, setPublishedStudies] = useState<Study[]>(studies);
+  const { profile } = useProfile();
+  const { isAdmin } = profile;
 
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
@@ -307,7 +310,15 @@ export default function Publications(
       message: 'Your study was published successfully!'
     });
 
-    publishAction(formData);
+    const id = await publishAction(formData);
+
+    // add the study to the published studies
+    setPublishedStudies(
+      prev => [
+        ...prev, 
+        { ...study, 
+          id, publishedBy: profile.email, publishedDate: new Date().toISOString() }
+      ]);
 
     // Reset form after submission
     resetForm();
@@ -316,27 +327,6 @@ export default function Publications(
 
   const handleModalClose = () => {
     setModalState(prev => ({ ...prev, isOpen: false }));
-  };
-
-  const editStudy = (studyID: string) => {
-    const studyToEdit = publishedStudies.find(study => study.id === studyID);
-    if (!studyToEdit) return;
-
-    setStudy({
-      id: studyToEdit.id,
-      title: studyToEdit.title,
-      description: studyToEdit.description,
-      authors: studyToEdit.authors,
-      type: studyToEdit.type,
-      categories: studyToEdit.categories,
-      publishedDate: studyToEdit.publishedDate,
-      publishedBy: studyToEdit.publishedBy,
-      isArchived: studyToEdit.isArchived,
-      isBestPaper: studyToEdit.isBestPaper,
-      isBookmarked: studyToEdit.isBookmarked,
-    });
-    setIsEditing(true);
-    window.scrollTo(0, 0);
   };
 
   const resetForm = () => {
@@ -785,11 +775,8 @@ export default function Publications(
               <div key={study.id} className="relative">
                 <StudyCard
                   study={study}
-                  isBookmarked={study.isBookmarked || false}
-                  isAdmin={false}
-                  isDashboard={false}
-                  onToggleBookmark={() => { }}
-                  onEdit={() => editStudy(study.id)}
+                  setStudies={setPublishedStudies}
+                  isAdmin={isAdmin}
                 />
               </div>
             ))}
