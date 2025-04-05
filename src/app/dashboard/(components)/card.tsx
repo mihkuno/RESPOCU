@@ -5,6 +5,8 @@ import {
   Bookmark, 
   BookmarkMinus, 
   Archive, 
+  ArchiveRestore,
+  Trash,
   Edit, 
   Award, 
   Star,
@@ -219,6 +221,34 @@ const StudyCard: React.FC<StudyCardProps> = ({
                 >
                   <Edit className="text-gray-600" size={18} />
                 </button>
+              </>
+            )}
+
+            {study.isArchived && (
+              <>
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (onArchive) onArchive(study.id);
+                  }}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  title="Restore Study"
+                  aria-label="Archive study"
+                >
+                  <ArchiveRestore className="text-gray-600" size={18} />
+                </button>
+
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onArchive) onArchive(study.id);
+                }}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                title="Delete Permanently"
+                aria-label="Archive study"
+              >
+                <Trash className="text-gray-600" size={18} />
+              </button>
               </>
             )}
             
