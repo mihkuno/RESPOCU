@@ -24,7 +24,6 @@ const schema = new mongoose.Schema({
     },
     research_type: {
         type: String,
-        // enum: ["research", "publication"],
         required: true,
     },
     authors: { 
@@ -32,13 +31,11 @@ const schema = new mongoose.Schema({
         required: true 
     },
     publisher: {
-        type: [mongoose.Schema.Types.ObjectId],
-        ref: "Account",
+        type: String,
         required: true,
     },
     bookmarked_by: {
-        type: [mongoose.Schema.Types.ObjectId],
-        ref: "Account",
+        type: [String],
     },
     is_best: {
         type: Boolean,
