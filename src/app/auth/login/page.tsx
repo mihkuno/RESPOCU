@@ -1,19 +1,30 @@
 "use client";
 import React, { useState } from 'react';
 import Image from 'next/image';
-// import { loginAction, signupAction, forgotPasswordAction } from '@/actions/auth';
+import { loginAction, signupAction, forgotAction } from '@/actions/auth';
+import { useSearchParams } from 'next/navigation';
 
-export default function AuthForm({ searchParams }: { searchParams: { error?: string } }) {
+
+export default function AuthForm() {
+
+    // login is the default
+    // authState is passed as a query parameter in the URL
+    const searchParams = useSearchParams();
+    let authState = searchParams.get('authState') as 'login' | 'signup' | 'forgot';
+    // check if authstate has login, signup or forgot
+    if (authState !== 'login' && authState !== 'signup' && authState !== 'forgot') {
+        authState = 'login';
+    }
+
     // State for form mode and validation
-    const [mode, setMode] = useState<'login' | 'signup' | 'forgot'>('login');
+    const [mode, setMode] = useState<'login' | 'signup' | 'forgot'>(authState);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    
-    // Server-side error from URL params
-    const serverError = searchParams.error;
-    
+    const [isLoading, setIsLoading] = useState(false);
+    const [serverError, setServerError] = useState<string | null>(null);
+
     // Handle form submission
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -58,15 +69,43 @@ export default function AuthForm({ searchParams }: { searchParams: { error?: str
             return;
         }
         
-        // Form is valid, submit based on mode
-        const formData = new FormData(e.target as HTMLFormElement);
+        // Form is valid, show loading state
+        setIsLoading(true);
         
-        if (mode === 'login') {
-            await loginAction(formData);
-        } else if (mode === 'signup') {
-            await signupAction(formData);
-        } else {
-            await forgotPasswordAction(formData);
+        try {
+            // Form is valid, submit based on mode
+            const formData = new FormData(e.target as HTMLFormElement);
+
+            if (mode === 'login') {
+                const response = await loginAction(formData);
+                if (response.error) {
+                    setServerError(response.error);
+                }
+            } 
+            else if (mode === 'signup') {
+                const response = await signupAction(formData);
+                if (response.error) {
+                    setServerError(response.error);
+                }
+            }   
+
+            else if (mode === 'forgot') {
+                const response = await forgotAction(formData);
+                if (response.error) {
+                    setServerError(response.error);
+                }
+            }
+            
+            // Simulate API call delay for demonstration purposes
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        } 
+        
+        catch (error) {
+            console.error('Authentication error:', error);
+        } 
+        
+        finally {
+            setIsLoading(false);
         }
     };
     
@@ -97,9 +136,9 @@ export default function AuthForm({ searchParams }: { searchParams: { error?: str
                 {/* Authentication Form */}
                 <form onSubmit={handleSubmit} className="space-y-5">
                     {/* Form Title */}
-                    <h2 className="text-2xl font-bold text-center text-gray-800">
+                    {/* <h2 className="text-2xl font-bold text-center text-gray-800">
                         {mode === 'login' ? 'Sign In' : mode === 'signup' ? 'Create Account' : 'Reset Password'}
-                    </h2>
+                    </h2> */}
 
                     {/* Email Field */}
                     <div>
@@ -117,6 +156,7 @@ export default function AuthForm({ searchParams }: { searchParams: { error?: str
                                 className={`block w-full px-4 py-3 pl-10 border ${
                                     errors.email ? 'border-red-500' : 'border-gray-300'
                                 } rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-red-900 focus:border-red-900 transition-colors bg-white/80`}
+                                disabled={isLoading}
                             />
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
@@ -142,6 +182,7 @@ export default function AuthForm({ searchParams }: { searchParams: { error?: str
                                         type="button"
                                         onClick={() => setMode('forgot')}
                                         className="text-xs text-red-800 hover:text-red-900"
+                                        disabled={isLoading}
                                     >
                                         Forgot password?
                                     </button>
@@ -158,6 +199,7 @@ export default function AuthForm({ searchParams }: { searchParams: { error?: str
                                     className={`block w-full px-4 py-3 pl-10 border ${
                                         errors.password ? 'border-red-500' : 'border-gray-300'
                                     } rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-red-900 focus:border-red-900 transition-colors bg-white/80`}
+                                    disabled={isLoading}
                                 />
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
@@ -188,6 +230,7 @@ export default function AuthForm({ searchParams }: { searchParams: { error?: str
                                     className={`block w-full px-4 py-3 pl-10 border ${
                                         errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
                                     } rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-red-900 focus:border-red-900 transition-colors bg-white/80`}
+                                    disabled={isLoading}
                                 />
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
@@ -212,9 +255,22 @@ export default function AuthForm({ searchParams }: { searchParams: { error?: str
                     <div>
                         <button
                             type="submit"
-                            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-base font-medium text-white bg-red-900 hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-900 transition-all"
+                            disabled={isLoading}
+                            className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-base font-medium text-white 
+                                ${isLoading ? 'bg-red-700 cursor-not-allowed' : 'bg-red-900 hover:bg-red-800'} 
+                                focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-900 transition-all`}
                         >
-                            {mode === 'login' ? 'Sign In' : mode === 'signup' ? 'Create Account' : 'Reset Password'}
+                            {isLoading ? (
+                                <div className="flex items-center">
+                                    <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    {mode === 'login' ? 'Signing In...' : mode === 'signup' ? 'Creating Account...' : 'Sending Reset Link...'}
+                                </div>
+                            ) : (
+                                mode === 'login' ? 'Sign In' : mode === 'signup' ? 'Create Account' : 'Reset Password'
+                            )}
                         </button>
                     </div>
 
@@ -227,6 +283,7 @@ export default function AuthForm({ searchParams }: { searchParams: { error?: str
                                     type="button"
                                     onClick={() => setMode('signup')}
                                     className="text-red-800 hover:text-red-900 font-medium"
+                                    disabled={isLoading}
                                 >
                                     Sign up
                                 </button>
@@ -240,6 +297,7 @@ export default function AuthForm({ searchParams }: { searchParams: { error?: str
                                     type="button"
                                     onClick={() => setMode('login')}
                                     className="text-red-800 hover:text-red-900 font-medium"
+                                    disabled={isLoading}
                                 >
                                     Sign in
                                 </button>
@@ -251,6 +309,7 @@ export default function AuthForm({ searchParams }: { searchParams: { error?: str
                                 type="button"
                                 onClick={() => setMode('login')}
                                 className="text-red-800 hover:text-red-900"
+                                disabled={isLoading}
                             >
                                 Back to Sign In
                             </button>
