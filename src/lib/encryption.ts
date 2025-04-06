@@ -1,13 +1,11 @@
-import { ACCESS_SECRET } from "@/constants/secrets";
-
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
 // Convert secret to a cryptographic key
-async function getKey(): Promise<CryptoKey> {
+async function getKey(rawKey: string): Promise<CryptoKey> {
   const keyMaterial = await crypto.subtle.importKey(
     "raw",
-    encoder.encode(ACCESS_SECRET || ""),
+    encoder.encode(rawKey),
     { name: "PBKDF2" },
     false,
     ["deriveKey"]
@@ -42,8 +40,8 @@ function urlFriendlyToBase64(urlFriendly: string): string {
   return base64;
 }
 
-export async function encrypt(rawText: string): Promise<string> {
-  const key = await getKey();
+export async function encrypt(rawText: string, rawKey: string = ""): Promise<string> {
+  const key = await getKey(rawKey);
   const iv = crypto.getRandomValues(new Uint8Array(12)); // AES-GCM requires 12-byte IV
   const encrypted = await crypto.subtle.encrypt(
     { name: "AES-GCM", iv },
@@ -61,13 +59,13 @@ export async function encrypt(rawText: string): Promise<string> {
   return base64ToUrlFriendly(base64);
 }
 
-export async function decrypt(encryptedText: string): Promise<string> {
+export async function decrypt(encryptedText: string, rawKey: string = ""): Promise<string> {
   // Convert the URL-friendly string back to standard Base64
   const base64 = urlFriendlyToBase64(encryptedText);
   const rawData = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
   const iv = rawData.slice(0, 12);
   const encryptedData = rawData.slice(12);
-  const key = await getKey();
+  const key = await getKey(rawKey);
 
   const decrypted = await crypto.subtle.decrypt(
     { name: "AES-GCM", iv },
