@@ -5,9 +5,8 @@ import { FiSearch, FiTrash2, FiToggleLeft, FiToggleRight } from 'react-icons/fi'
 
 interface User {
   id: string;
-  name: string;
   email: string;
-  created_at: string;
+  created_at: Date;
   type: 'user' | 'admin';
 }
 
@@ -16,7 +15,6 @@ export default function Accounts({ accountList }: { accountList: User[] }) {
   const [users, setUsers] = useState<User[]>(accountList || []);
 
   const filteredUsers = users.filter(user =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -53,7 +51,6 @@ export default function Accounts({ accountList }: { accountList: User[] }) {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Admin</th>
@@ -65,9 +62,6 @@ export default function Accounts({ accountList }: { accountList: User[] }) {
                 <tr key={user.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-500">{user.id}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{user.name}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-500">{user.email}</div>
