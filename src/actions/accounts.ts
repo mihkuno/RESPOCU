@@ -36,12 +36,12 @@ export async function removeAdmin(id: string) {
     return account;
 }
 
-export async function deleteAccount(id: string) {
+export async function deleteAccount(email: string) {
     // TODO: validate the access token
     await connectDatabase();
 
     // Delete the account from the database
-    const account = await Account.findByIdAndDelete(id);
+    const account = await Account.findOneAndDelete({ email });
     if (!account) {
         throw new Error("Account not found");
     }
@@ -59,5 +59,22 @@ export async function createAccount(email: string, password: string) {
     if (!account) {
         throw new Error("Account not created");
     }
+    return account;
+}
+
+export async function checkExisting(email: string) {
+    // TODO: validate the access token
+    await connectDatabase();
+
+    // Check if the account already exists
+    const account = await Account.findOne({ email });
+    return account;
+}
+
+export async function checkPassword(email: string, password: string) {
+    // TODO: validate the access token
+    await connectDatabase();
+
+    const account = await Account.findOne({ email, password });
     return account;
 }
