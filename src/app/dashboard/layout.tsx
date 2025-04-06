@@ -13,6 +13,7 @@ import {
 import { ArrowRightOnRectangleIcon as LogoutIcon } from '@heroicons/react/24/outline';
 import LogoutModal from '@/component/logoutModal'; 
 import { useProfile } from '@/providers/profileContext';
+import { logoutAction } from '@/actions/auth';
 
 // Parent layout component
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -23,8 +24,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const brandMaroon = '#9F1E22';
   const brandYellow = '#FFB81C';
 
-  const handleLogout = () => {
-    console.log("User logged out");
+  const handleLogout = async () => {
+    await logoutAction();
     setIsLogoutModalOpen(false);
   };
 
