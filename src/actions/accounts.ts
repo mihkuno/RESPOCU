@@ -9,7 +9,12 @@ export async function viewAccounts() {
 
     // Fetch all accounts from the database
     const accounts = await Account.find({}).sort({ createdAt: -1 });
-    return accounts;
+    return accounts.map(account => ({
+        id: account._id.toString(),
+        email: account.email as string,
+        created_at: account.created_at as Date,
+        type: account.type as "user" | "admin",
+    }));
 }
 
 export async function setAdmin(id: string) {
