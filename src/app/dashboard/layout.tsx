@@ -11,9 +11,9 @@ import {
   UserIcon,
 } from '@heroicons/react/24/outline';
 import { ArrowRightOnRectangleIcon as LogoutIcon } from '@heroicons/react/24/outline';
-import LogoutModal from '@/component/logoutModal'; 
 import { useProfile } from '@/providers/profileContext';
 import { logoutAction } from '@/actions/auth';
+import Modal from './(components)/modal';
 
 // Parent layout component
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -73,12 +73,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         </div>
       </main>
-      
-      <LogoutModal 
+
+      {/* Logout Modal */}
+      <Modal 
         isOpen={isLogoutModalOpen}
-        onClose={() => setIsLogoutModalOpen(false)}
-        onLogout={handleLogout}
+        type="confirmation"
+        title="Logout Confirmation"
+        message="Are you sure you want to log out?"
+        onConfirm={handleLogout}
+        onCancel={() => setIsLogoutModalOpen(false)}
       />
+
     </div>
   );
 }
