@@ -4,6 +4,8 @@ import Research from "@/models/Research";
 import { revalidatePath } from "next/cache";
 
 export async function addBookmark(id: string, email: string) {
+    // TODO: validate the access token for this action
+
     await connectDatabase();
 
     await Research.findByIdAndUpdate(
@@ -18,6 +20,8 @@ export async function addBookmark(id: string, email: string) {
 }
 
 export async function removeBookmark(id: string, email: string) {
+    // TODO: validate the access token for this action
+    
     await connectDatabase();
 
     await Research.findByIdAndUpdate(
