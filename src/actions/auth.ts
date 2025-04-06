@@ -73,6 +73,9 @@ Promise<{ status: 'expired' | 'valid' | 'invalid' | 'existing'; }> {
             console.log("Setting token in cookies");
             const cookieStore = await cookies();
             cookieStore.set("token", token, { httpOnly: true });
+            // Remove the email_to_verify cookie
+            console.log("Deleting email_to_verify cookie");
+            cookieStore.delete("email_to_verify");
             
             return { status: "valid" };
         }
@@ -143,6 +146,11 @@ Promise<{ status: 'expired' | 'valid' | 'invalid' | 'existing'; }> {
             // Delete the account
             console.log("Deleting account");
             await deleteAccount(email);
+
+            // Remove the email_to_verify cookie
+            console.log("Deleting email_to_verify cookie");
+            const cookieStore = await cookies();
+            cookieStore.delete("email_to_verify");
 
             return { status: "valid" };
         }
@@ -260,4 +268,10 @@ export async function forgotAction(formData: FormData) {
 
     // redirect after email sent.
     redirect("/auth/verify"); 
+}
+
+export async function logoutAction() {
+    const cookieStore = await cookies();
+    cookieStore.delete("token");
+    redirect('/auth/login');
 }
