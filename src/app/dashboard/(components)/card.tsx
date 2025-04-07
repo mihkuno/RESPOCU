@@ -33,6 +33,7 @@ interface Study {
   type: string;
   publishedDate: string;
   authors: string[];
+  advisor: string;
   publishedBy: string;
   categories: string[];
   isArchived: boolean;
@@ -114,7 +115,7 @@ export default function StudyCard({ study, setStudies }: StudyCardProps) {
     }
   }
   
-  const onEdit = async (studyId: string) => {
+  const onEdit = (studyId: string) => {
     // Implement edit functionality here
     router.push('/dashboard/publications/?edit=' + studyId);
   }
@@ -239,6 +240,12 @@ export default function StudyCard({ study, setStudies }: StudyCardProps) {
             <Users size={16} className="mr-2 text-gray-400" />
             <span className="font-medium mr-1">Authors:</span>
             <span>{study.authors.join(', ')}</span>
+          </div>
+
+          <div className="flex items-center">
+            <User size={16} className="mr-2 text-gray-400" />
+            <span className="font-medium mr-1">Advisor:</span>
+            <span>{study.advisor}</span>
           </div>
           
           <div className="flex items-center">

@@ -1,4 +1,3 @@
-
 import React from "react";
 import Publications from "./publications";
 import Research from "@/models/Research";
@@ -11,7 +10,7 @@ export default async function PublicationsLayout({ searchParams }: {
     searchParams: Promise<{edit: string}>;
 }) {
     
-    await connectDatabase();  
+    await connectDatabase();    
 
     const headersList = await headers();
     const accountEmail = headersList.get('email') as string;
@@ -25,26 +24,26 @@ export default async function PublicationsLayout({ searchParams }: {
 
         // TODO: validate the access token for this action
 
-        const publisher =       accountEmail;
-        const id =              formData.get("id");
-        const title =           formData.get("title");
-        const description =     formData.get("description");
-        const research_type =   formData.get("research_type");
-        const authors =         JSON.parse(formData.get("authors")    as string);
-        const categories =      JSON.parse(formData.get("categories") as string);
-        const file =            JSON.parse(formData.get("file")       as string);
+        const publisher =        accountEmail;
+        const id =             formData.get("id");
+        const title =          formData.get("title");
+        const description =    formData.get("description");
+        const research_type =  formData.get("research_type");
+        const advisor =        formData.get("advisor");
+        const authors =        JSON.parse(formData.get("authors")      as string);
+        const categories =     JSON.parse(formData.get("categories") as string);
+        const file =           JSON.parse(formData.get("file")         as string);
 
-        console.log(id, title, description, research_type, authors, categories, publisher, file);
-         
+            
         let response;
         if (!id) {
             response = await Research.create({
-                title, description, categories, research_type, authors, publisher, file, created_at: Date.now(),
+                title, description, categories, research_type, authors, advisor, publisher, file, created_at: Date.now(),
             });
         }
         else {
             response = await Research.findByIdAndUpdate(new mongoose.Types.ObjectId(id as string), {
-                title, description, categories, research_type, authors, publisher, file, created_at: Date.now(),
+                title, description, categories, research_type, authors, advisor, publisher, file, created_at: Date.now(),
             });
         }
 
@@ -62,6 +61,7 @@ export default async function PublicationsLayout({ searchParams }: {
             categories: study.categories,
             type: study.research_type,
             authors: study.authors,
+            advisor: study.advisor,
             publishedBy: study.publisher,
             publishedDate: study.created_at,
             isBestPaper: study.is_best,
@@ -81,6 +81,7 @@ export default async function PublicationsLayout({ searchParams }: {
                 categories: response.categories,
                 type: response.research_type,
                 authors: response.authors,
+                advisor: response.advisor,
                 publishedBy: response.publisher,
                 publishedDate: response.created_at,
                 isBestPaper: response.is_best,
@@ -92,7 +93,7 @@ export default async function PublicationsLayout({ searchParams }: {
                 name: response.file.name as string,
                 size: response.file.size as number,
                 type: response.file.type as string,
-                data: response.file.data as Buffer,
+                data: response.file.data.toString('base64'), // Convert Buffer to base64
                 last_modified: response.file.last_modified as number,
             };
     
@@ -105,5 +106,5 @@ export default async function PublicationsLayout({ searchParams }: {
         }
     }
 
-    return <Publications studies={publishedStudies} publishAction={handlePublishAction}  />;
+    return <Publications studies={publishedStudies} publishAction={handlePublishAction} />;
 }

@@ -13,6 +13,7 @@ interface Study {
   type: string;
   publishedDate: string;
   authors: string[];
+  advisor: string;
   publishedBy: string;
   categories: string[];
   isArchived: boolean;
@@ -102,6 +103,7 @@ export default function Home({ studyData }: { studyData: Study[] }) {
       .filter(study => {
         const matchesSearch = study.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
           study.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          study.advisor.toLowerCase().includes(searchQuery.toLowerCase()) ||
           study.authors.some(author => author.toLowerCase().includes(searchQuery.toLowerCase())) ||
           study.categories.some(category => category.toLowerCase().includes(searchQuery.toLowerCase()));
 

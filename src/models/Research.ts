@@ -30,6 +30,10 @@ const schema = new mongoose.Schema({
         type: [String], 
         required: true 
     },
+    advisor: {
+        type: String,
+        required: true,  
+    },
     publisher: {
         type: String,
         required: true,
