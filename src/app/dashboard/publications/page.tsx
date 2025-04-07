@@ -5,6 +5,7 @@ import Research from "@/models/Research";
 import mongoose from "mongoose";
 import { connectDatabase } from "@/lib/database";
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 
 export default async function PublicationsLayout({ searchParams }: {
     searchParams: Promise<{edit: string}>;
@@ -12,8 +13,10 @@ export default async function PublicationsLayout({ searchParams }: {
     
     await connectDatabase();  
 
-    // TODO: get the email from the headers
-    const accountEmail = "caindayjoeninyo@gmail.com"
+    const headersList = await headers();
+    const accountEmail = headersList.get('email') as string;
+    const type = headersList.get('type') as string;
+
     const query = await searchParams;
     const { edit } = query;
 
