@@ -8,6 +8,7 @@ import { deleteStudy } from '@/actions/study';
 import { markBestPaper } from '@/actions/study';
 import { unmarkBestPaper } from '@/actions/study';
 import { getFile } from '@/actions/study';
+import { useRouter } from 'next/navigation';
 
 import React from 'react';
 import { 
@@ -49,6 +50,7 @@ export default function StudyCard({ study, setStudies }: StudyCardProps) {
 
   const { profile } = useProfile();
   const { email, isAdmin } = profile;
+  const router = useRouter();
 
   const onToggleBookmark = async (studyId: string) => {
     setStudies((prevStudies) => {
@@ -114,6 +116,7 @@ export default function StudyCard({ study, setStudies }: StudyCardProps) {
   
   const onEdit = async (studyId: string) => {
     // Implement edit functionality here
+    router.push('/dashboard/publications/?edit=' + studyId);
   }
 
   const onClick = async (studyId: string) => {
