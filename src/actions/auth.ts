@@ -9,12 +9,13 @@ import { connectDatabase } from "@/lib/database";
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import nodemailer from "nodemailer";
+import { revalidatePath } from "next/cache";
 
 
-export async function createAccessToken(email: string, password: string) {
+export async function createAccessToken(email: string, password: string, type: string = "user") {
     const expires = Date.now() + 365 * 24 * 60 * 60 * 1000; // Token valid for 1 year
     const data = await encrypt(
-        JSON.stringify({ email, password, expires }),
+        JSON.stringify({ email, password, expires, type }),
         process.env.ACCESS_SECRET
     );
     return data;
@@ -182,11 +183,13 @@ export async function loginAction(formData: FormData) {
         if (account.password !== password) {
             return { error: "Incorrect password" };
         }
-        const token = await createAccessToken(email, password);
+        const token = await createAccessToken(email, password, account.type);
         cookieStore.set("token", token, { httpOnly: true });
         cookieStore.delete("email_to_verify");
         redirect('/dashboard');
     } 
+
+    revalidatePath("/");
     return { error: "Account does not exist" };
 }
 
@@ -227,6 +230,7 @@ export async function signupAction(formData: FormData) {
         maxAge: 10 * 60, // expire in 10 minutes 
     }); 
 
+    revalidatePath("/");
     // redirect after email sent.
     redirect("/auth/verify"); 
 }
@@ -267,6 +271,7 @@ export async function forgotAction(formData: FormData) {
         maxAge: 10 * 60, // expire in 10 minutes 
     }); 
 
+    revalidatePath("/");
     // redirect after email sent.
     redirect("/auth/verify"); 
 }
@@ -274,5 +279,6 @@ export async function forgotAction(formData: FormData) {
 export async function logoutAction() {
     const cookieStore = await cookies();
     cookieStore.delete("token");
+    revalidatePath("/");
     redirect('/auth/login');
 }
