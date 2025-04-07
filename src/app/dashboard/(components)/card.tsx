@@ -7,6 +7,7 @@ import { restoreArchive } from '@/actions/study';
 import { deleteStudy } from '@/actions/study';
 import { markBestPaper } from '@/actions/study';
 import { unmarkBestPaper } from '@/actions/study';
+import { getFile } from '@/actions/study';
 
 import React from 'react';
 import { 
@@ -116,7 +117,28 @@ export default function StudyCard({ study, setStudies }: StudyCardProps) {
   }
 
   const onClick = async (studyId: string) => {
-    // Implement click functionality here
+    try {
+      // Get the file data
+      const response = await getFile(studyId);
+      
+      // Convert base64 back to binary data
+      const binaryString = atob(response.data);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      
+      // Create a blob from the binary data
+      const blob = new Blob([bytes], { type: response.type });
+      
+      // Create a URL for the blob
+      const blobUrl = URL.createObjectURL(blob);
+      
+      // Open the URL in a new tab
+      window.open(blobUrl, '_blank');
+    } catch (error) {
+      console.error("Error opening file:", error);
+    }
   };
 
   const formattedDate = new Date(study.publishedDate).toLocaleDateString('en-US', {

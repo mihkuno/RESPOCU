@@ -4,6 +4,29 @@ import Research from "@/models/Research";
 import { revalidatePath } from "next/cache";
 
 
+export async function getFile(id: string) {
+    // TODO: validate the access token for this action
+
+    await connectDatabase();
+
+    const study = await Research.findById(id).select("file");
+
+    if (!study) {
+        throw new Error("Study not found");
+    }
+
+    // Convert Buffer to base64 string
+    const base64Data = study.file.data.toString('base64');
+
+    return {
+        id: study._id.toString(),
+        name: study.file.name as string,
+        size: study.file.size as number,
+        type: study.file.type as string,
+        data: base64Data, // base64 string instead of Buffer
+        last_modified: study.file.last_modified as Date,
+    }
+}
 
 export async function viewStudies(email: string) {
     // TODO: validate the access token for this action
