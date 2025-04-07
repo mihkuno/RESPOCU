@@ -119,29 +119,32 @@ export default function StudyCard({ study, setStudies }: StudyCardProps) {
     // Implement edit functionality here
     router.push('/dashboard/publications/?edit=' + studyId);
   }
-
+  
   const onClick = async (studyId: string) => {
     try {
-      // Get the file data
       const response = await getFile(studyId);
-      
-      // Convert base64 back to binary data
-      const binaryString = atob(response.data);
+      const { data, type } = response;
+  
+      if (!data || !type) throw new Error("Invalid file response");
+  
+      // Base64 decode
+      const binaryString = atob(data);
       const bytes = new Uint8Array(binaryString.length);
       for (let i = 0; i < binaryString.length; i++) {
         bytes[i] = binaryString.charCodeAt(i);
       }
-      
-      // Create a blob from the binary data
-      const blob = new Blob([bytes], { type: response.type });
-      
-      // Create a URL for the blob
-      const blobUrl = URL.createObjectURL(blob);
-      
-      // Open the URL in a new tab
-      window.open(blobUrl, '_blank');
+  
+      // Create Blob and object URL
+      const blob = new Blob([bytes], { type: type });
+      const url = URL.createObjectURL(blob);
+  
+      // Open in new tab
+      window.open(url, '_blank');
+  
+      // Optional: Clean up after use
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
     } catch (error) {
-      console.error("Error opening file:", error);
+      console.error("Error displaying PDF:", error);
     }
   };
 

@@ -32,8 +32,12 @@ export default async function PublicationsLayout({ searchParams }: {
         const advisor =        formData.get("advisor");
         const authors =        JSON.parse(formData.get("authors")      as string);
         const categories =     JSON.parse(formData.get("categories") as string);
-        const file =           JSON.parse(formData.get("file")         as string);
+        const file =           JSON.parse(formData.get("file") as string);
 
+        console.log(file.data);
+
+        // convert the file to a buffer
+        file.data = Buffer.from(file.data, 'base64');
             
         let response;
         if (!id) {
