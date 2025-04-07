@@ -186,10 +186,10 @@ export async function loginAction(formData: FormData) {
         const token = await createAccessToken(email, password, account.type);
         cookieStore.set("token", token, { httpOnly: true });
         cookieStore.delete("email_to_verify");
+        revalidatePath("/");
         redirect('/dashboard');
     } 
 
-    revalidatePath("/");
     return { error: "Account does not exist" };
 }
 
