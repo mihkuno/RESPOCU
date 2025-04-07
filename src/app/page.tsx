@@ -133,7 +133,7 @@ export default function LandingPage() {
                             Join Capitol University's digital research repository today and unlock a world of academic resources.
                         </p>
                         <div className="flex justify-center">
-                            <Link href="/login">
+                            <Link href="/auth/login">
                                 <button className="px-8 py-3 border border-transparent rounded-lg text-base font-bold text-red-900 bg-yellow-400 hover:bg-yellow-300 transition-all shadow-md">
                                     Login with University Email
                                 </button>
