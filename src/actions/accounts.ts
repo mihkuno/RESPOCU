@@ -24,9 +24,9 @@ export async function setAdmin(id: string) {
     // Update the account to be an admin
     const account = await Account.findByIdAndUpdate(id, { type: "admin" }, { new: true });
     if (!account) {
-        throw new Error("Account not found");
+        return { status: 'Account does not exist'}
     }
-    return account;
+    return { status: 'success' };
 }
 
 export async function removeAdmin(id: string) {
@@ -36,21 +36,21 @@ export async function removeAdmin(id: string) {
     // Update the account to be a user
     const account = await Account.findByIdAndUpdate(id, { type: "user" }, { new: true });
     if (!account) {
-        throw new Error("Account not found");
+        return { status: 'Account does not exist'}
     }
-    return account;
+    return { status: 'success' };
 }
 
-export async function deleteAccount(email: string) {
+export async function deleteAccount(id: string) {
     // TODO: validate the access token
     await connectDatabase();
 
-    // Delete the account from the database
-    const account = await Account.findOneAndDelete({ email });
+    // Find the account by id
+    const account = await Account.findByIdAndDelete(id);
     if (!account) {
         throw new Error("Account not found");
     }
-    return account;
+    return { status: 'success' };
 }
 
 export async function createAccount(email: string, password: string) {
@@ -64,7 +64,7 @@ export async function createAccount(email: string, password: string) {
     if (!account) {
         throw new Error("Account not created");
     }
-    return account;
+    return { status: 'success' };
 }
 
 export async function checkExisting(email: string) {
