@@ -49,7 +49,7 @@ export default function LandingPage() {
                                 Empowering Senior High Students with access to curated research papers and educational resources.
                             </p>
                             <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                                <Link href="/explore">
+                                <Link href="/auth/login">
                                     <button className="px-8 py-3 border border-transparent rounded-lg text-base font-medium text-white bg-red-900 hover:bg-red-800 transition-all shadow-md">
                                         Explore Resources
                                     </button>
