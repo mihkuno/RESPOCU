@@ -20,6 +20,11 @@ export default function AboutPage() {
             image: "/team/banaag-zhoe-b.jpg"
         },
         {
+            name: "Cainday, Joeninyo",
+            role: "Developer",
+            image: "/team/cainday-joeninyo.jpg"
+        },
+        {
             name: "Casis, Liezel C.",
             role: "Member",
             image: "/team/casis-liezel-c.jpg"
@@ -97,6 +102,7 @@ export default function AboutPage() {
     const leaderMembers = teamMembers.filter(member => member.role === "Leader");
     const assistantLeaderMembers = teamMembers.filter(member => member.role === "Assistant Leader");
     const secretaryMembers = teamMembers.filter(member => member.role === "Secretary");
+    const developerMembers = teamMembers.filter(member => member.role === "Developer");
     const regularMembers = teamMembers.filter(member => member.role === "Member");
 
     
@@ -279,9 +285,8 @@ export default function AboutPage() {
                 </div>
             </div>
             
-            {/* Team Section */}
-          {/* Improved Team Section */}
-          <div className="relative z-10 bg-slate-100/90 backdrop-blur-sm py-16 px-4 sm:px-6 lg:px-8">
+            {/* Team Section - Enhanced UI */}
+            <div className="relative z-10 bg-slate-100/90 backdrop-blur-sm py-16 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-12">
                         <h2 className="text-3xl font-bold text-gray-900 mb-4">Meet Our Team</h2>
@@ -292,11 +297,11 @@ export default function AboutPage() {
                     </div>
                     
                     {/* Leadership Team - Prominent display */}
-                    <div className="mb-12">
-                        <h3 className="text-xl font-semibold text-red-900 mb-6 text-center">Leadership Team</h3>
+                    <div className="mb-16">
+                        <h3 className="text-2xl font-semibold text-red-900 mb-8 text-center">Leadership Team</h3>
                         <div className="flex flex-wrap justify-center gap-8">
                             {leaderMembers.map((member, index) => (
-                                <div key={index} className="bg-white rounded-xl p-6 shadow-md border border-red-200 flex flex-col items-center text-center transition-all hover:shadow-lg hover:border-red-400 max-w-xs">
+                                <div key={index} className="bg-white rounded-xl p-8 shadow-md border border-red-200 flex flex-col items-center text-center transition-all hover:shadow-lg hover:border-red-400 max-w-xs hover:transform hover:-translate-y-1">
                                     <div className="w-32 h-32 relative rounded-full overflow-hidden mb-4 border-4 border-red-900 shadow-md">
                                         <Image 
                                             src={member.image} 
@@ -313,7 +318,7 @@ export default function AboutPage() {
                             ))}
                             
                             {assistantLeaderMembers.map((member, index) => (
-                                <div key={index} className="bg-white rounded-xl p-6 shadow-md border border-red-200 flex flex-col items-center text-center transition-all hover:shadow-lg hover:border-red-400 max-w-xs">
+                                <div key={index} className="bg-white rounded-xl p-8 shadow-md border border-red-200 flex flex-col items-center text-center transition-all hover:shadow-lg hover:border-red-400 max-w-xs hover:transform hover:-translate-y-1">
                                     <div className="w-32 h-32 relative rounded-full overflow-hidden mb-4 border-4 border-red-700 shadow-md">
                                         <Image 
                                             src={member.image} 
@@ -330,7 +335,7 @@ export default function AboutPage() {
                             ))}
                             
                             {secretaryMembers.map((member, index) => (
-                                <div key={index} className="bg-white rounded-xl p-6 shadow-md border border-red-200 flex flex-col items-center text-center transition-all hover:shadow-lg hover:border-red-400 max-w-xs">
+                                <div key={index} className="bg-white rounded-xl p-8 shadow-md border border-red-200 flex flex-col items-center text-center transition-all hover:shadow-lg hover:border-red-400 max-w-xs hover:transform hover:-translate-y-1">
                                     <div className="w-32 h-32 relative rounded-full overflow-hidden mb-4 border-4 border-red-500 shadow-md">
                                         <Image 
                                             src={member.image} 
@@ -348,27 +353,50 @@ export default function AboutPage() {
                         </div>
                     </div>
                     
-                    {/* Team Members - Grid layout with improved cards */}
-                    <div>
-                        <h3 className="text-xl font-semibold text-gray-800 mb-6 text-center">Team Members</h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                            {regularMembers.map((member, index) => (
-                                <div key={index} className="bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200 transition-all hover:shadow-md hover:border-yellow-400 group">
-                                    <div className="relative h-48 overflow-hidden">
+                    {/* Developer Section */}
+                    <div className="mb-16">
+                        <h3 className="text-2xl font-semibold text-blue-800 mb-8 text-center">Development Team</h3>
+                        <div className="flex flex-wrap justify-center gap-8">
+                            {developerMembers.map((member, index) => (
+                                <div key={index} className="bg-gradient-to-br from-blue-50 to-white rounded-xl p-10 shadow-lg border border-blue-200 flex flex-col items-center text-center transition-all hover:shadow-xl hover:border-blue-400 max-w-xs group">
+                                    <div className="w-36 h-36 relative rounded-full overflow-hidden mb-6 border-4 border-blue-600 shadow-md group-hover:border-blue-500">
                                         <Image 
                                             src={member.image} 
                                             alt={member.name} 
                                             fill
                                             className="object-cover group-hover:scale-105 transition-transform duration-300" 
                                         />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-70"></div>
                                     </div>
-                                    <div className="p-4">
-                                        <h3 className="text-sm font-bold text-gray-900 truncate">{member.name}</h3>
-                                        <span className="inline-block bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded mt-1">
-                                            {member.role}
-                                        </span>
+                                    <span className="bg-blue-600 text-white text-sm font-bold px-4 py-1 rounded-full mb-3 group-hover:bg-blue-500 transition-colors">
+                                        {member.role}
+                                    </span>
+                                    <h3 className="text-xl font-bold text-gray-900">{member.name}</h3>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    
+                    {/* Team Members - Enhanced Hexagonal Grid */}
+                    <div className="mb-8">
+                        <h3 className="text-2xl font-semibold text-gray-800 mb-8 text-center">Team Members</h3>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 max-w-6xl mx-auto">
+                            {regularMembers.map((member, index) => (
+                                <div key={index} className="group flex flex-col items-center">
+                                    <div className="relative w-full aspect-square mb-4 overflow-hidden transform transition-transform duration-300 group-hover:scale-105 rounded-lg shadow-md border-2 border-gray-200 group-hover:border-yellow-400 group-hover:shadow-lg">
+                                        <Image 
+                                            src={member.image} 
+                                            alt={member.name}
+                                            fill
+                                            className="object-cover" 
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent opacity-0 group-hover:opacity-70 transition-opacity duration-300"></div>
+                                        <div className="absolute bottom-0 left-0 right-0 p-3 text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                                            <span className="text-xs bg-yellow-400 text-yellow-900 px-2 py-0.5 rounded-full font-medium">
+                                                {member.role}
+                                            </span>
+                                        </div>
                                     </div>
+                                    <h3 className="text-sm font-bold text-gray-900 text-center">{member.name}</h3>
                                 </div>
                             ))}
                         </div>
