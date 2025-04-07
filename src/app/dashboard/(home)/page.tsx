@@ -332,7 +332,7 @@ export default function Home({ studyData }: { studyData: Study[] }) {
           ))}
         </div>
       ) : (
-        <div className="py-16 bg-white/90 backdrop-blur-sm rounded-lg shadow-md m-auto flex flex-col items-center justify-center text-center">
+        <div className="py-16 rounded-lg m-auto flex flex-col items-center justify-center text-center">
           <h3 className="text-2xl font-semibold text-gray-900 mb-4">
             No studies found
           </h3>
