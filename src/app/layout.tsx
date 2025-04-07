@@ -2,7 +2,7 @@ import React from "react";
 import type { Metadata } from "next";
 import { ProfileProvider } from "@/providers/profileContext";
 import { CookiesProvider } from 'next-client-cookies/server';
-
+import { headers } from "next/headers";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -10,17 +10,19 @@ export const metadata: Metadata = {
   description: "Your easy to manage web application for event reservation",
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode; }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode; }>) {
 
-  // TODO: get the profile data from the header
-  const email = 'caindayjoeninyo@gmail.com';
-  const isAdmin = true;
+    const headersList = await headers();
+    const email = headersList.get('email') as string;
+    const type = headersList.get('type') as string;
+
+    console.log(type);
 
   return (
     <html lang="en">
       <body className={`antialiased`}>
         <CookiesProvider>
-        <ProfileProvider profileData={{ email, isAdmin }}>
+        <ProfileProvider profileData={{ email, isAdmin: type === "admin" }}>
           {children}
         </ProfileProvider>
         </CookiesProvider>
