@@ -319,7 +319,7 @@ export default function AboutPage() {
                             
                             {assistantLeaderMembers.map((member, index) => (
                                 <div key={index} className="bg-white rounded-xl p-8 shadow-md border border-red-200 flex flex-col items-center text-center transition-all hover:shadow-lg hover:border-red-400 max-w-xs hover:transform hover:-translate-y-1">
-                                    <div className="w-32 h-32 relative rounded-full overflow-hidden mb-4 border-4 border-red-700 shadow-md">
+                                    <div className="w-32 h-32 relative rounded-full overflow-hidden mb-4 border-4 border-red-900 shadow-md">
                                         <Image 
                                             src={member.image} 
                                             alt={member.name} 
@@ -327,7 +327,7 @@ export default function AboutPage() {
                                             className="object-cover" 
                                         />
                                     </div>
-                                    <span className="bg-red-700 text-white text-xs font-bold px-3 py-1 rounded-full mb-2">
+                                    <span className="bg-red-900 text-white text-xs font-bold px-3 py-1 rounded-full mb-2">
                                         {member.role}
                                     </span>
                                     <h3 className="text-lg font-bold text-gray-900">{member.name}</h3>
@@ -336,7 +336,7 @@ export default function AboutPage() {
                             
                             {secretaryMembers.map((member, index) => (
                                 <div key={index} className="bg-white rounded-xl p-8 shadow-md border border-red-200 flex flex-col items-center text-center transition-all hover:shadow-lg hover:border-red-400 max-w-xs hover:transform hover:-translate-y-1">
-                                    <div className="w-32 h-32 relative rounded-full overflow-hidden mb-4 border-4 border-red-500 shadow-md">
+                                    <div className="w-32 h-32 relative rounded-full overflow-hidden mb-4 border-4 border-red-900 shadow-md">
                                         <Image 
                                             src={member.image} 
                                             alt={member.name} 
@@ -344,7 +344,7 @@ export default function AboutPage() {
                                             className="object-cover" 
                                         />
                                     </div>
-                                    <span className="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-2">
+                                    <span className="bg-red-900 text-white text-xs font-bold px-3 py-1 rounded-full mb-2">
                                         {member.role}
                                     </span>
                                     <h3 className="text-lg font-bold text-gray-900">{member.name}</h3>
