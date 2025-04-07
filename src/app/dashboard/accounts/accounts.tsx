@@ -25,7 +25,7 @@ interface ModalState {
   action: 'delete' | 'toggle' | null;
 }
 
-export default function Accounts({ accountList, currentUserEmail = '' }: { accountList: User[], currentUserEmail?: string }) {
+export default function Accounts({ accountList }: { accountList: User[] }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [users, setUsers] = useState<User[]>(accountList || []);
   const [modalState, setModalState] = useState<ModalState>({
@@ -36,7 +36,7 @@ export default function Accounts({ accountList, currentUserEmail = '' }: { accou
     targetId: '',
     action: null
   });
-  const { profile } = useProfile();
+  const { profile, setProfile } = useProfile();
 
   const filteredUsers = users.filter(user =>
     user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -45,7 +45,7 @@ export default function Accounts({ accountList, currentUserEmail = '' }: { accou
 
   // Handler for initiating admin toggle
   const handleToggleAdmin = (user: User) => {
-    const isSelf = user.email === currentUserEmail;
+    const isSelf = user.email === profile.email;
     const newType = user.type === 'admin' ? 'user' : 'admin';
     
     setModalState({
@@ -64,7 +64,7 @@ export default function Accounts({ accountList, currentUserEmail = '' }: { accou
 
   // Handler for initiating user deletion
   const handleDeleteUser = (user: User) => {
-    const isSelf = user.email === currentUserEmail;
+    const isSelf = user.email === profile.email;
     
     setModalState({
       isOpen: true,
@@ -85,7 +85,7 @@ export default function Accounts({ accountList, currentUserEmail = '' }: { accou
     try {
       if (modalState.action === 'delete') {
         const targetUser = users.find(user => user.id === modalState.targetId);
-        const isSelf = targetUser?.email === currentUserEmail;
+        const isSelf = targetUser?.email === profile.email;
         
         // Call the server action to delete the account
         await deleteAccount(modalState.targetId);
@@ -116,8 +116,13 @@ export default function Accounts({ accountList, currentUserEmail = '' }: { accou
         // Call the appropriate server action based on the new type
         if (newType === 'admin') {
           await setAdmin(modalState.targetId);
+
         } else {
           await removeAdmin(modalState.targetId);
+
+          if (targetUser?.email === profile.email) {
+            setProfile({ ...profile, isAdmin: false });
+          }
         }
         
         // Update local state
@@ -139,7 +144,7 @@ export default function Accounts({ accountList, currentUserEmail = '' }: { accou
         });
         
         // If the user changed their own permissions, refresh the profile context
-        if (targetUser?.email === currentUserEmail) {
+        if (targetUser?.email === profile.email) {
           window.location.reload(); // Refresh to update UI based on new permissions
         }
       } else {
@@ -198,7 +203,7 @@ export default function Accounts({ accountList, currentUserEmail = '' }: { accou
           <tbody className="bg-white divide-y divide-gray-200">
             {filteredUsers.length > 0 ? (
               filteredUsers.map((user) => {
-                const isSelf = user.email === currentUserEmail;
+                const isSelf = user.email === profile.email;
                 return (
                   <tr key={user.id} className={`hover:bg-gray-50 ${isSelf ? 'bg-blue-50' : ''}`}>
                     <td className="px-6 py-4 whitespace-nowrap">
